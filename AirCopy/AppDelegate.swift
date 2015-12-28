@@ -141,7 +141,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSNetServiceBrowserDelegate 
         
         browser = NSNetServiceBrowser()
         browser.delegate = self
-        browser.searchForServicesOfType("_aircopy._tcp.", inDomain: "")
+        browser.searchForServicesOfType(AirCopyService.ServiceType, inDomain: "")
         
         NSNotificationCenter.defaultCenter().addObserverForName(NSMenuDidBeginTrackingNotification, object: statusMenu, queue: nil) { [weak self] notif in
             guard let this = self else { return }
