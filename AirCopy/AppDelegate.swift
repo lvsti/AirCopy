@@ -179,7 +179,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSNetServiceBrowserDelegate 
             statusMenu.addItem(NSMenuItem.staticItemWithTitle("Send clipboard contents to:"))
         }
         else {
-            statusMenu.addItem(NSMenuItem.staticItemWithTitle("No devices found"))
+            statusMenu.addItem(NSMenuItem.staticItemWithTitle("No nearby devices"))
         }
         
         for service in services {
@@ -248,8 +248,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSNetServiceBrowserDelegate 
     
     func netServiceBrowser(browser: NSNetServiceBrowser, didFindService service: NSNetService, moreComing: Bool) {
         NSLog("service found: %@", service)
-        
-        currentServices.append(service)
+        if service != localService.netService {
+            currentServices.append(service)
+        }
         
         if !moreComing {
             updateMenuWithServices(currentServices)
