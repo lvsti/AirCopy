@@ -85,12 +85,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSNetServiceBrowserDelegate 
     var browser: NSNetServiceBrowser!
     var currentServices: [NSNetService] = []
     var currentPasteboardItems: [NSPasteboardItem] = []
-    var localService: AirCopyService!
     var trampoline: ActionTrampoline<NSMenuItem>!
 
     func applicationDidFinishLaunching(aNotification: NSNotification) {
-        localService = AirCopyService()
-        localService.start()
+        AirCopyService.sharedService.start()
 
         trampoline = ActionTrampoline<NSMenuItem> { [weak self] (item: NSMenuItem) in
             NSLog("menu item clicked: %@", item)
@@ -150,7 +148,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSNetServiceBrowserDelegate 
     }
 
     func applicationWillTerminate(aNotification: NSNotification) {
-        localService.stop()
+        AirCopyService.sharedService.stop()
     }
     
     func updatePasteboardItems() {

@@ -9,14 +9,16 @@
 import Foundation
 
 
-class AirCopyService : NSObject, NSNetServiceDelegate, TransferDelegate {
+class AirCopyService: NSObject, NSNetServiceDelegate, TransferDelegate {
     
     static let ServiceType = "_aircopy._tcp."
     
-    let netService: NSNetService
-    var transfers: Set<InboundTransfer>
+    private let netService: NSNetService
+    private var transfers: Set<InboundTransfer>
     
-    override init() {
+    static let sharedService = AirCopyService()
+    
+    private override init() {
         netService = NSNetService(domain: "", type: AirCopyService.ServiceType, name: "", port: 0)
         transfers = []
         super.init()
