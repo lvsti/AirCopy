@@ -137,6 +137,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSNetServiceBrowserDelegate 
         statusItem.title = "AirCopy"
         statusItem.menu = statusMenu
         
+        NSMenu.setMenuBarVisible(false)
+        
         browser = NSNetServiceBrowser()
         browser.delegate = self
         browser.searchForServicesOfType("_aircopy._tcp.", inDomain: "")
