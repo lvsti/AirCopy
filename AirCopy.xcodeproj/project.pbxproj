@@ -13,6 +13,7 @@
 		BE1946571C30610E00AB6E2F /* AirCopyService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1946561C30610E00AB6E2F /* AirCopyService.swift */; };
 		BE3C83AF1C31EDB8001658E6 /* StateMachine.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE3C83AE1C31EDB8001658E6 /* StateMachine.swift */; };
 		BE3C83B11C31EF7C001658E6 /* InboundTransfer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE3C83B01C31EF7C001658E6 /* InboundTransfer.swift */; };
+		BE3C83B71C329D88001658E6 /* NSMenuItem+Handler.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE3C83B61C329D88001658E6 /* NSMenuItem+Handler.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +25,7 @@
 		BE1946561C30610E00AB6E2F /* AirCopyService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AirCopyService.swift; sourceTree = "<group>"; };
 		BE3C83AE1C31EDB8001658E6 /* StateMachine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StateMachine.swift; sourceTree = "<group>"; };
 		BE3C83B01C31EF7C001658E6 /* InboundTransfer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InboundTransfer.swift; sourceTree = "<group>"; };
+		BE3C83B61C329D88001658E6 /* NSMenuItem+Handler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSMenuItem+Handler.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -61,6 +63,7 @@
 				BE19464D1C3056EF00AB6E2F /* MainMenu.xib */,
 				BE1946501C3056EF00AB6E2F /* Info.plist */,
 				BE1946561C30610E00AB6E2F /* AirCopyService.swift */,
+				BE3C83B61C329D88001658E6 /* NSMenuItem+Handler.swift */,
 				BE3C83AE1C31EDB8001658E6 /* StateMachine.swift */,
 				BE3C83B01C31EF7C001658E6 /* InboundTransfer.swift */,
 			);
@@ -141,6 +144,7 @@
 				BE19464A1C3056EF00AB6E2F /* AppDelegate.swift in Sources */,
 				BE3C83AF1C31EDB8001658E6 /* StateMachine.swift in Sources */,
 				BE1946571C30610E00AB6E2F /* AirCopyService.swift in Sources */,
+				BE3C83B71C329D88001658E6 /* NSMenuItem+Handler.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
