@@ -8,6 +8,10 @@
 
 import Foundation
 
+enum IOError: ErrorType {
+    case Unknown
+}
+
 extension NSOutputStream {
     func writeUInt64(value: UInt64) throws -> Int {
         let ptr = UnsafeMutablePointer<UInt64>.alloc(1)

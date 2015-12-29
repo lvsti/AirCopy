@@ -9,18 +9,6 @@
 import Cocoa
 
 
-extension NSMenuItem {
-    class func staticItemWithTitle(title: String) -> NSMenuItem {
-        let item = NSMenuItem(title: title, action: nil, keyEquivalent: "")
-        item.enabled = false
-        return item
-    }
-}
-
-enum IOError: ErrorType {
-    case Unknown
-}
-
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
 
