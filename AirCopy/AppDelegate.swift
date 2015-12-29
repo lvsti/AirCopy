@@ -29,38 +29,6 @@ enum IOError: ErrorType {
     case Unknown
 }
 
-extension NSOutputStream {
-    func writeUInt64(value: UInt64) throws -> Int {
-        let ptr = UnsafeMutablePointer<UInt64>.alloc(1)
-        defer { ptr.dealloc(1) }
-        ptr.initialize(value.bigEndian)
-        
-        let length = sizeof(UInt64)
-        let count = write(UnsafePointer<UInt8>(ptr), maxLength: length)
-        if count < length {
-            throw IOError.Unknown
-        }
-        return count
-    }
-    
-    func writeUTF8String(string: String) throws -> Int {
-        guard let data = string.dataUsingEncoding(NSUTF8StringEncoding) else {
-            throw IOError.Unknown
-        }
-        return try writeData(data)
-    }
-    
-    func writeData(data: NSData) throws -> Int {
-        let count = try writeUInt64(UInt64(data.length))
-        let count2 = write(UnsafePointer<UInt8>(data.bytes), maxLength: data.length)
-        if count2 < data.length {
-            throw IOError.Unknown
-        }
-        
-        return count + count2
-    }
-}
-
 
 class ActionTrampoline<T>: NSObject {
     private let _action: T -> Void
@@ -104,6 +72,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             outputStream.open()
 
             let pbItems = self!.currentPasteboardItems
+            let transfer = OutboundTransfer(outputStream: outputStream)
             
             itemLoop:
             for pbItem in pbItems {
@@ -113,8 +82,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                         continue
                     }
                     do {
-                        try outputStream.writeUTF8String(type)
-                        try outputStream.writeData(itemData)
+                        try transfer.transferItemWithType(type, data: itemData)
                     }
                     catch {
                         break itemLoop

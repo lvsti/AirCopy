@@ -15,6 +15,7 @@
 		BE3C83B11C31EF7C001658E6 /* InboundTransfer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE3C83B01C31EF7C001658E6 /* InboundTransfer.swift */; };
 		BE3C83B31C31F06A001658E6 /* ServiceBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE3C83B21C31F06A001658E6 /* ServiceBrowser.swift */; };
 		BE3C83B71C329D88001658E6 /* NSMenuItem+Handler.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE3C83B61C329D88001658E6 /* NSMenuItem+Handler.swift */; };
+		BE3C83B91C32A6A7001658E6 /* OutboundTransfer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE3C83B81C32A6A7001658E6 /* OutboundTransfer.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +29,7 @@
 		BE3C83B01C31EF7C001658E6 /* InboundTransfer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InboundTransfer.swift; sourceTree = "<group>"; };
 		BE3C83B21C31F06A001658E6 /* ServiceBrowser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ServiceBrowser.swift; sourceTree = "<group>"; };
 		BE3C83B61C329D88001658E6 /* NSMenuItem+Handler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSMenuItem+Handler.swift"; sourceTree = "<group>"; };
+		BE3C83B81C32A6A7001658E6 /* OutboundTransfer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OutboundTransfer.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,6 +68,7 @@
 				BE1946501C3056EF00AB6E2F /* Info.plist */,
 				BE1946561C30610E00AB6E2F /* AirCopyService.swift */,
 				BE3C83B61C329D88001658E6 /* NSMenuItem+Handler.swift */,
+				BE3C83B81C32A6A7001658E6 /* OutboundTransfer.swift */,
 				BE3C83B21C31F06A001658E6 /* ServiceBrowser.swift */,
 				BE3C83AE1C31EDB8001658E6 /* StateMachine.swift */,
 				BE3C83B01C31EF7C001658E6 /* InboundTransfer.swift */,
@@ -148,6 +151,7 @@
 				BE3C83AF1C31EDB8001658E6 /* StateMachine.swift in Sources */,
 				BE3C83B31C31F06A001658E6 /* ServiceBrowser.swift in Sources */,
 				BE1946571C30610E00AB6E2F /* AirCopyService.swift in Sources */,
+				BE3C83B91C32A6A7001658E6 /* OutboundTransfer.swift in Sources */,
 				BE3C83B71C329D88001658E6 /* NSMenuItem+Handler.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
