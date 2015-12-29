@@ -8,9 +8,6 @@
 
 import Cocoa
 
-let kDefaultWidth: CGFloat = 250
-let kMaxItemHeight: CGFloat = 250
-
 
 extension NSMenuItem {
     class func staticItemWithTitle(title: String) -> NSMenuItem {
@@ -87,99 +84,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationWillTerminate(aNotification: NSNotification) {
         AirCopyService.sharedService.stop()
-    }
-    
-    func updatePasteboardItems() {
-        let pasteboard = NSPasteboard.generalPasteboard()
-        guard let items = pasteboard.pasteboardItems else {
-            return
-        }
-        
-        currentPasteboardItems = items
-    }
-    
-    func updateMenuWithServices(services: [NSNetService]) {
-        statusMenu.removeAllItems()
-        
-        if let pasteboardView = currentPasteboardView() {
-            let pasteboardItem = NSMenuItem()
-            pasteboardItem.view = pasteboardView
-            statusMenu.addItem(pasteboardItem)
-        }
-        else {
-            statusMenu.addItem(NSMenuItem.staticItemWithTitle("Clipboard is empty"))
-        }
-        
-        
-        statusMenu.addItem(NSMenuItem.separatorItem())
-        
-        if services.count > 0 {
-            statusMenu.addItem(NSMenuItem.staticItemWithTitle("Send clipboard contents to:"))
-        }
-        else {
-            statusMenu.addItem(NSMenuItem.staticItemWithTitle("No nearby devices"))
-        }
-        
-        for service in services {
-            let item = NSMenuItem(title: service.name, action: Selector("action:"), keyEquivalent: "")
-            item.target = trampoline
-            item.representedObject = service
-            item.indentationLevel = 1
-            statusMenu.addItem(item)
-        }
-        
-        statusMenu.addItem(NSMenuItem.separatorItem())
-        
-        let item = NSMenuItem(title: "Quit AirCopy", action: Selector("terminate:"), keyEquivalent: "q")
-        item.target = NSApplication.sharedApplication()
-        statusMenu.addItem(item)
-    }
-    
-    func currentPasteboardView() -> NSView? {
-        updatePasteboardItems()
-        
-        guard
-            let item = currentPasteboardItems.first,
-            let preferredType = item.types.first
-        else {
-            return nil
-        }
-        
-        if UTTypeConformsTo(preferredType, kUTTypeImage) {
-            guard
-                let imageData = item.dataForType(preferredType),
-                let image = NSImage(data: imageData)
-            else {
-                return nil
-            }
-
-            let view = NSImageView(frame: NSRect(x: 0, y: 0, width: kDefaultWidth, height: min(image.size.height, kDefaultWidth*image.size.height/image.size.width)))
-            view.image = image
-            return view
-        }
-
-        if UTTypeConformsTo(preferredType, kUTTypeText) {
-            guard
-                let string = item.stringForType(preferredType)
-            else {
-                return nil
-            }
-            
-            let view = NSTextField(frame: NSRect(x: 0, y: 0, width: kDefaultWidth, height: kMaxItemHeight))
-            view.selectable = false
-            view.editable = false
-            view.bezeled = false
-            view.stringValue = string
-            
-            var fitSize = view.sizeThatFits(NSSize(width: kDefaultWidth, height: kMaxItemHeight))
-            fitSize.width = kDefaultWidth
-            fitSize.height = min(fitSize.height, kMaxItemHeight)
-            view.frame = NSRect(origin: CGPoint.zero, size: fitSize)
-
-            return view
-        }
-        
-        return nil
     }
     
 }

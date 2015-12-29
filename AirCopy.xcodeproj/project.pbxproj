@@ -17,6 +17,7 @@
 		BE3C83B51C329233001658E6 /* MenuController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE3C83B41C329233001658E6 /* MenuController.swift */; };
 		BE3C83B71C329D88001658E6 /* NSMenuItem+Handler.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE3C83B61C329D88001658E6 /* NSMenuItem+Handler.swift */; };
 		BE3C83B91C32A6A7001658E6 /* OutboundTransfer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE3C83B81C32A6A7001658E6 /* OutboundTransfer.swift */; };
+		BE3C83BB1C32AAA1001658E6 /* PasteboardController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE3C83BA1C32AAA1001658E6 /* PasteboardController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +33,7 @@
 		BE3C83B41C329233001658E6 /* MenuController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MenuController.swift; sourceTree = "<group>"; };
 		BE3C83B61C329D88001658E6 /* NSMenuItem+Handler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSMenuItem+Handler.swift"; sourceTree = "<group>"; };
 		BE3C83B81C32A6A7001658E6 /* OutboundTransfer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OutboundTransfer.swift; sourceTree = "<group>"; };
+		BE3C83BA1C32AAA1001658E6 /* PasteboardController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasteboardController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -73,6 +75,7 @@
 				BE3C83B41C329233001658E6 /* MenuController.swift */,
 				BE3C83B61C329D88001658E6 /* NSMenuItem+Handler.swift */,
 				BE3C83B81C32A6A7001658E6 /* OutboundTransfer.swift */,
+				BE3C83BA1C32AAA1001658E6 /* PasteboardController.swift */,
 				BE3C83B21C31F06A001658E6 /* ServiceBrowser.swift */,
 				BE3C83AE1C31EDB8001658E6 /* StateMachine.swift */,
 			);
@@ -150,6 +153,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BE3C83B11C31EF7C001658E6 /* InboundTransfer.swift in Sources */,
+				BE3C83BB1C32AAA1001658E6 /* PasteboardController.swift in Sources */,
 				BE19464A1C3056EF00AB6E2F /* AppDelegate.swift in Sources */,
 				BE3C83AF1C31EDB8001658E6 /* StateMachine.swift in Sources */,
 				BE3C83B31C31F06A001658E6 /* ServiceBrowser.swift in Sources */,
