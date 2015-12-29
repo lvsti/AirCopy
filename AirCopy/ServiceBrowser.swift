@@ -42,13 +42,10 @@ class ServiceBrowser: NSObject, NSNetServiceBrowserDelegate {
     // MARK: - NSNetServiceBrowserDelegate:
     
     func netServiceBrowser(browser: NSNetServiceBrowser, didFindService service: NSNetService, moreComing: Bool) {
-        NSLog("service found: %@", service)
-        guard let hostname = NSHost.currentHost().localizedName where service.name != hostname else {
-            return
+        if let hostname = NSHost.currentHost().localizedName where service.name != hostname {
+            _pendingServices.append(service)
         }
-
-        _pendingServices.append(service)
-        
+    
         if !moreComing {
             _services = _pendingServices
             delegate?.serviceBrowserDidUpdateServices(self)
@@ -56,8 +53,6 @@ class ServiceBrowser: NSObject, NSNetServiceBrowserDelegate {
     }
 
     func netServiceBrowser(browser: NSNetServiceBrowser, didRemoveService service: NSNetService, moreComing: Bool) {
-        NSLog("service disappeared: %@", service)
-        
         if let index = _pendingServices.indexOf(service) {
             _pendingServices.removeAtIndex(index)
         }
