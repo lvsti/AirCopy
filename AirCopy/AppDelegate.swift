@@ -78,12 +78,10 @@ class ActionTrampoline<T>: NSObject {
 
 
 @NSApplicationMain
-class AppDelegate: NSObject, NSApplicationDelegate, NSNetServiceBrowserDelegate {
+class AppDelegate: NSObject, NSApplicationDelegate {
 
     @IBOutlet weak var statusMenu: NSMenu!
     var statusItem: NSStatusItem!
-    var browser: NSNetServiceBrowser!
-    var currentServices: [NSNetService] = []
     var currentPasteboardItems: [NSPasteboardItem] = []
     var trampoline: ActionTrampoline<NSMenuItem>!
 
@@ -92,7 +90,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSNetServiceBrowserDelegate 
 
         trampoline = ActionTrampoline<NSMenuItem> { [weak self] (item: NSMenuItem) in
             NSLog("menu item clicked: %@", item)
-            self!.browser.stop()
             
             let service = item.representedObject as! NSNetService
 
@@ -137,9 +134,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSNetServiceBrowserDelegate 
         
         NSMenu.setMenuBarVisible(false)
         
-        browser = NSNetServiceBrowser()
-        browser.delegate = self
-        browser.searchForServicesOfType(AirCopyService.ServiceType, inDomain: "")
         
         NSNotificationCenter.defaultCenter().addObserverForName(NSMenuDidBeginTrackingNotification, object: statusMenu, queue: nil) { [weak self] notif in
             guard let this = self else { return }
@@ -242,31 +236,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSNetServiceBrowserDelegate 
         }
         
         return nil
-    }
-    
-    // MARK: - NSNetServiceBrowserDelegate:
-    
-    func netServiceBrowser(browser: NSNetServiceBrowser, didFindService service: NSNetService, moreComing: Bool) {
-        NSLog("service found: %@", service)
-        if service != localService.netService {
-            currentServices.append(service)
-        }
-        
-        if !moreComing {
-            updateMenuWithServices(currentServices)
-        }
-    }
-
-    func netServiceBrowser(browser: NSNetServiceBrowser, didRemoveService service: NSNetService, moreComing: Bool) {
-        NSLog("service disappeared: %@", service)
-        
-        if let index = currentServices.indexOf(service) {
-            currentServices.removeAtIndex(index)
-        }
-        
-        if !moreComing {
-            updateMenuWithServices(currentServices)
-        }
     }
     
 }
