@@ -9,56 +9,46 @@
 import Foundation
 import AppKit
 
+let kDefaultWidth: CGFloat = 250
+let kMaxItemHeight: CGFloat = 250
 
-class MenuController: ServiceBrowserDelegate {
+
+class MenuController: NSObject, ServiceBrowserDelegate, NSMenuDelegate {
+    // dependencies
     private let _browser: ServiceBrowser
-    
+    private let _pasteboardController: PasteboardController
     private let _menu: NSMenu
-    private var _menuObserver: NSObjectProtocol!
 
-    private let _pasteboardItem: NSMenuItem
-    
+    // state
+    private let _previewItem: NSMenuItem
     private let _servicesHeaderItem: NSMenuItem
     private var _serviceItems: [NSMenuItem]
-
     private let _otherItems: [NSMenuItem]
     
-    init(menu: NSMenu) {
+    init(menu: NSMenu, browser: ServiceBrowser, pasteboardController: PasteboardController) {
         _menu = menu
-        _pasteboardItem = NSMenuItem(title: "Clipboard is empty")
+        _browser = browser
+        _pasteboardController = pasteboardController
         
-        _servicesHeaderItem = NSMenuItem(title: "")
+        _previewItem = NSMenuItem(title: "Clipboard is empty")
+        _servicesHeaderItem = NSMenuItem(title: "No nearby devices")
         _serviceItems = []
-        
         _otherItems = [
             NSMenuItem(title: "Quit AirCopy", keyEquivalent: "q") { _ in
                 NSApplication.sharedApplication().terminate(nil)
             }
         ]
-
-        _browser = ServiceBrowser()
-        _browser.delegate = self
-
-        let onMenuOpenNotification = { [unowned self] (_: NSNotification) in
-            self.updateMenu()
-            
-            self._browser.start()
-        }
         
-        _menuObserver = NSNotificationCenter.defaultCenter().addObserverForName(NSMenuDidBeginTrackingNotification,
-            object: _menu,
-            queue: nil,
-            usingBlock: onMenuOpenNotification)
+        super.init()
+        
+        _browser.delegate = self
+        _menu.delegate = self
     }
     
-    deinit {
-        NSNotificationCenter.defaultCenter().removeObserver(_menuObserver)
-    }
-    
-    func updateMenu() {
+    func rebuildMenu() {
         _menu.removeAllItems()
         
-        _menu.addItem(_pasteboardItem)
+        _menu.addItem(_previewItem)
         _menu.addItem(NSMenuItem.separatorItem())
 
         _menu.addItem(_servicesHeaderItem)
@@ -76,7 +66,7 @@ class MenuController: ServiceBrowserDelegate {
         _serviceItems.removeAll(keepCapacity: true)
         
         for service in services {
-            let item = NSMenuItem(title: service.name, keyEquivalent: "") { _ in
+            let item = NSMenuItem(title: service.name) { _ in
                 
             }
             item.representedObject = service
@@ -87,14 +77,28 @@ class MenuController: ServiceBrowserDelegate {
         _servicesHeaderItem.title = services.count > 0 ? "Send clipboard contents to:" : "No nearby devices"
     }
     
-    func updatePasteboardSectionWithView(view: NSView?) {
-        _pasteboardItem.view = view
+    func updatePreviewItemWithView(view: NSView?) {
+        _previewItem.view = view
+    }
+    
+    // MARK: - from NSMenuDelegate:
+    
+    func menuNeedsUpdate(menu: NSMenu) {
+        _pasteboardController.update()
+        let pasteboardPreview = _pasteboardController.viewForItem(_pasteboardController.currentItem,
+            constrainedToSize: CGSize(width: kDefaultWidth, height: kMaxItemHeight))
+        updatePreviewItemWithView(pasteboardPreview)
+        
+        rebuildMenu()
+        
+        _browser.start()
     }
     
     // MARK: - from ServiceBrowserDelegate:
     
     func serviceBrowserDidUpdateServices(browser: ServiceBrowser) {
         updateServiceItemsWithServices(browser.services)
+        rebuildMenu()
     }
     
 }

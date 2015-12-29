@@ -67,7 +67,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         NSMenu.setMenuBarVisible(false)
         
-        menuController = MenuController(menu: statusMenu)
+        menuController = MenuController(menu: statusMenu, browser: ServiceBrowser(), pasteboardController: PasteboardController())
     }
 
     func applicationWillTerminate(aNotification: NSNotification) {
