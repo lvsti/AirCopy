@@ -11,11 +11,6 @@ import Cocoa
 let kDefaultWidth: CGFloat = 250
 let kMaxItemHeight: CGFloat = 250
 
-enum PasteboardItemRepresentation {
-    case Text(String)
-    case Image(NSImage)
-}
-
 
 extension NSMenuItem {
     class func staticItemWithTitle(title: String) -> NSMenuItem {
@@ -29,22 +24,6 @@ enum IOError: ErrorType {
     case Unknown
 }
 
-
-class ActionTrampoline<T>: NSObject {
-    private let _action: T -> Void
-    
-    init(action: T -> Void) {
-        _action = action
-        super.init()
-    }
-    
-    @objc
-    func action(sender: AnyObject) {
-        _action(sender as! T)
-    }
-}
-
-
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
 
@@ -52,6 +31,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var statusItem: NSStatusItem!
     var currentPasteboardItems: [NSPasteboardItem] = []
     var trampoline: ActionTrampoline<NSMenuItem>!
+    var menuController: MenuController!
 
     func applicationDidFinishLaunching(aNotification: NSNotification) {
         AirCopyService.sharedService.start()
@@ -102,11 +82,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         NSMenu.setMenuBarVisible(false)
         
-        
-        NSNotificationCenter.defaultCenter().addObserverForName(NSMenuDidBeginTrackingNotification, object: statusMenu, queue: nil) { [weak self] notif in
-            guard let this = self else { return }
-            this.updateMenuWithServices(this.currentServices)
-        }
+        menuController = MenuController(menu: statusMenu)
     }
 
     func applicationWillTerminate(aNotification: NSNotification) {
