@@ -8,14 +8,20 @@
 
 import Foundation
 
+struct Transition<StateType> {
+    let nextState: StateType
+    let condition: () -> Bool
+    let action: () -> Void
+}
+
 class StateMachine<StateType: Hashable> {
-    typealias Transition = (nextState: StateType, condition: () -> Bool, action: () -> Void)
-    let transitions: [StateType: [Transition]]
+    typealias TransitionMapType = [StateType: [Transition<StateType>]]
+    let transitions: TransitionMapType
     
     private var _currentState: StateType
     var currentState: StateType { return _currentState }
     
-    init(initialState: StateType, transitions: [StateType: [Transition]]) {
+    init(initialState: StateType, transitions: TransitionMapType) {
         self.transitions = transitions
         _currentState = initialState
     }

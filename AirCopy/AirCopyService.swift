@@ -48,8 +48,8 @@ class AirCopyService: NSObject, NSNetServiceDelegate, TransferDelegate {
     
     // MARK: - from TransferDelegate:
     
-    func transferDidProduceItemWithType(type: String, data: NSData) {
-        NSLog("item: %@, %@", type, data)
+    func transferDidProduceItemWithContents(contents: [String : NSData]) {
+        NSLog("item: %@", contents)
     }
     
     func transferDidEnd(transfer: InboundTransfer) {

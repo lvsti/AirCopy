@@ -9,105 +9,185 @@
 import Foundation
 
 protocol TransferDelegate: class {
-    func transferDidProduceItemWithType(type: String, data: NSData)
+    func transferDidProduceItemWithContents(contents: [String: NSData])
     func transferDidEnd(transfer: InboundTransfer)
 }
 
 
 enum InboundTransferState {
-    case AwaitingTypeSize, AwaitingType, AwaitingDataSize, AwaitingData
+    case AwaitingRepCount, EvaluatingRepCount
+    case AwaitingTypeSize, AwaitingType, AwaitingDataSize, AwaitingData, CheckingLoopCondition
+    case Trap
 }
 
 
 class InboundTransfer: NSObject, NSStreamDelegate {
-    let service: NSNetService
-    let inputStream: NSInputStream
+    private let _service: NSNetService
+    private let _inputStream: NSInputStream
     
-    let incomingData: NSMutableData
-    let chunk: UnsafeMutablePointer<UInt8>
-    static let ChunkSize = 1024
+    private let _incomingData: NSMutableData
+    private let _chunk: UnsafeMutablePointer<UInt8>
+    private static let ChunkSize = 1024
     
-    var expectedSize: UInt64 = 0
-    var itemType: String = ""
+    private var _expectedSize: UInt64 = 0
+    private var _repCount: UInt8 = 0
+    private var _itemType: String = ""
+    private var _itemContents: [String: NSData] = [:]
 
-    var stateMachine: StateMachine<InboundTransferState>!
+    private var _stateMachine: StateMachine<InboundTransferState>!
     weak var delegate: TransferDelegate? = nil
     
     init(service: NSNetService, inputStream: NSInputStream) {
-        self.service = service
-        self.inputStream = inputStream
-        incomingData = NSMutableData()
-        chunk = UnsafeMutablePointer<UInt8>.alloc(InboundTransfer.ChunkSize)
+        _service = service
+        _inputStream = inputStream
+        _incomingData = NSMutableData()
+        _chunk = UnsafeMutablePointer<UInt8>.alloc(InboundTransfer.ChunkSize)
         
         super.init()
-
-        stateMachine = StateMachine<InboundTransferState>(
-            initialState: .AwaitingTypeSize,
-            transitions: [
-                .AwaitingTypeSize: [
-                    (nextState: .AwaitingType,
-                    condition: { [unowned self] in
-                        return self.incomingData.length >= sizeof(UInt64)
-                    },
-                    action: { [unowned self] in
-                        self.expectedSize = UInt64(bigEndian: UnsafePointer<UInt64>(self.incomingData.bytes).memory)
-                        self.incomingData.replaceBytesInRange(NSMakeRange(0, sizeof(UInt64)),
-                                                              withBytes: UnsafePointer<Void>(),
-                                                              length: 0)
-                    })
-                ],
-                .AwaitingType: [
-                    (nextState: .AwaitingDataSize,
-                    condition: { [unowned self] in
-                        return self.incomingData.length >= Int(self.expectedSize)
-                    },
-                    action: { [unowned self] in
-                        self.itemType = NSString(bytes: self.incomingData.bytes,
-                                                 length: Int(self.expectedSize),
-                                                 encoding: NSUTF8StringEncoding)! as String
-                        self.incomingData.replaceBytesInRange(NSMakeRange(0, Int(self.expectedSize)),
-                                                              withBytes: UnsafePointer<Void>(),
-                                                              length: 0)
-                    })
-                ],
-                .AwaitingDataSize: [
-                    (nextState: .AwaitingData,
-                    condition: { [unowned self] in
-                        return self.incomingData.length >= sizeof(UInt64)
-                    },
-                    action: { [unowned self] in
-                        self.expectedSize = UInt64(bigEndian: UnsafePointer<UInt64>(self.incomingData.bytes).memory)
-                        self.incomingData.replaceBytesInRange(NSMakeRange(0, sizeof(UInt64)),
-                                                              withBytes: UnsafePointer<Void>(),
-                                                              length: 0)
-                    })
-                ],
-                .AwaitingData: [
-                    (nextState: .AwaitingTypeSize,
-                    condition: { [unowned self] in
-                        return self.incomingData.length >= Int(self.expectedSize)
-                    },
-                    action: { [unowned self] in
-                        let itemData = self.incomingData.subdataWithRange(NSMakeRange(0, Int(self.expectedSize)))
-                        self.delegate?.transferDidProduceItemWithType(self.itemType, data: itemData)
-                        self.incomingData.replaceBytesInRange(NSMakeRange(0, Int(self.expectedSize)),
-                                                              withBytes: UnsafePointer<Void>(),
-                                                              length: 0)
-                    })
-                ]
-            ]
+        
+        _stateMachine = StateMachine<InboundTransferState>(
+            initialState: .AwaitingRepCount,
+            transitions: transitionMap()
         )
         
         inputStream.delegate = self
     }
     
     deinit {
-        inputStream.close()
-        chunk.dealloc(InboundTransfer.ChunkSize)
+        _inputStream.close()
+        _chunk.dealloc(InboundTransfer.ChunkSize)
     }
     
     func start() {
-        inputStream.open()
+        _inputStream.open()
+    }
+    
+    private func transitionMap() -> StateMachine<InboundTransferState>.TransitionMapType {
+        var transitions: StateMachine<InboundTransferState>.TransitionMapType = [:]
+        
+        transitions[.AwaitingRepCount] = [
+            Transition(
+                nextState: .EvaluatingRepCount,
+                condition: { [unowned self] in
+                    return self._incomingData.length >= 1
+                },
+                action: { [unowned self] in
+                    self._repCount = UnsafePointer<UInt8>(self._incomingData.bytes).memory
+                }
+            )
+        ]
+        
+        transitions[.EvaluatingRepCount] = [
+            Transition(
+                nextState: .Trap,
+                condition: { [unowned self] in
+                    return self._repCount == 0
+                },
+                action: {}
+            ),
+            Transition(
+                nextState: .AwaitingTypeSize,
+                condition: { [unowned self] in
+                    return self._repCount > 0
+                },
+                action: {}
+            )
+        ]
+        
+        transitions[.Trap] = [
+            Transition(
+                nextState: .Trap,
+                condition: { return false },
+                action: { [unowned self] () -> Void in
+                    self.delegate?.transferDidEnd(self)
+                }
+            )
+        ]
+        
+        transitions[.AwaitingTypeSize] = [
+            Transition(
+                nextState: .AwaitingType,
+                condition: { [unowned self] in
+                    return self._incomingData.length >= sizeof(UInt64)
+                },
+                action: { [unowned self] in
+                    self._expectedSize = UInt64(bigEndian: UnsafePointer<UInt64>(self._incomingData.bytes).memory)
+                    self._incomingData.replaceBytesInRange(NSMakeRange(0, sizeof(UInt64)),
+                                                           withBytes: UnsafePointer<Void>(),
+                                                           length: 0)
+                }
+            )
+        ]
+        
+        transitions[.AwaitingType] = [
+            Transition(
+                nextState: .AwaitingDataSize,
+                condition: { [unowned self] in
+                    return self._incomingData.length >= Int(self._expectedSize)
+                },
+                action: { [unowned self] in
+                    self._itemType = NSString(bytes: self._incomingData.bytes,
+                                              length: Int(self._expectedSize),
+                                              encoding: NSUTF8StringEncoding)! as String
+                    self._incomingData.replaceBytesInRange(NSMakeRange(0, Int(self._expectedSize)),
+                                                           withBytes: UnsafePointer<Void>(),
+                                                           length: 0)
+                }
+            )
+        ]
+        
+        transitions[.AwaitingDataSize] = [
+            Transition(
+                nextState: .AwaitingData,
+                condition: { [unowned self] in
+                    return self._incomingData.length >= sizeof(UInt64)
+                },
+                action: { [unowned self] in
+                    self._expectedSize = UInt64(bigEndian: UnsafePointer<UInt64>(self._incomingData.bytes).memory)
+                    self._incomingData.replaceBytesInRange(NSMakeRange(0, sizeof(UInt64)),
+                                                           withBytes: UnsafePointer<Void>(),
+                                                           length: 0)
+                }
+            )
+        ]
+        
+        transitions[.AwaitingData] = [
+            Transition(
+                nextState: .CheckingLoopCondition,
+                condition: { [unowned self] in
+                    return self._incomingData.length >= Int(self._expectedSize)
+                },
+                action: { [unowned self] in
+                    let itemData = self._incomingData.subdataWithRange(NSMakeRange(0, Int(self._expectedSize)))
+                    self._itemContents[self._itemType] = itemData
+                    self._incomingData.replaceBytesInRange(NSMakeRange(0, Int(self._expectedSize)),
+                                                           withBytes: UnsafePointer<Void>(),
+                                                           length: 0)
+                    self._repCount -= 1
+                }
+            )
+        ]
+        
+        transitions[.CheckingLoopCondition] = [
+            Transition(
+                nextState: .AwaitingRepCount,
+                condition: { [unowned self] in
+                    return self._repCount == 0
+                },
+                action: { [unowned self] () -> Void in
+                    self.delegate?.transferDidProduceItemWithContents(self._itemContents)
+                }
+            ),
+            Transition(
+                nextState: .AwaitingTypeSize,
+                condition: { [unowned self] in
+                    return self._repCount > 0
+                },
+                action: {}
+            )
+        ]
+        
+        return transitions
     }
     
     // from NSStreamDelegate:
@@ -123,10 +203,10 @@ class InboundTransfer: NSObject, NSStreamDelegate {
             return
         }
 
-        let count = inputStream.read(chunk, maxLength: InboundTransfer.ChunkSize)
-        incomingData.appendBytes(chunk, length: count)
+        let count = _inputStream.read(_chunk, maxLength: InboundTransfer.ChunkSize)
+        _incomingData.appendBytes(_chunk, length: count)
 
-        stateMachine.step()
+        _stateMachine.step()
     }
 
 }
