@@ -79,17 +79,8 @@ class MenuController: NSObject, ServiceBrowserDelegate, NSMenuDelegate, AirCopyS
                 guard let pasteboardItem = self._pasteboardController.currentItem else {
                     return
                 }
-                
-                var pbItemReps: [(String, NSData)] = []
-                for repType in pasteboardItem.types {
-                    guard let repData = pasteboardItem.dataForType(repType) else {
-                        NSLog("cannot get data for representation %@", repType)
-                        continue
-                    }
-                    pbItemReps.append((repType, repData))
-                }
-                
-                self._service.sendPasteboardItemsWithRepresentations([pbItemReps], toNetService: service)
+                let reps = self._pasteboardController.representationsForItem(pasteboardItem)
+                self._service.sendPasteboardItemsWithRepresentations([reps], toNetService: service)
             }
             
             menuItem.indentationLevel = 1

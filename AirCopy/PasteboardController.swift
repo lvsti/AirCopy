@@ -13,14 +13,53 @@ class PasteboardController {
     
     private var _currentItem: NSPasteboardItem? = nil
     var currentItem: NSPasteboardItem? { return _currentItem }
+    
+    private var _receivedItems: [String: NSPasteboardItem] = [:]
+    var receivedItems: [String: NSPasteboardItem] { return _receivedItems }
 
+    private let _pasteboard: NSPasteboard
+    
     init() {
-        
+        _pasteboard = NSPasteboard.generalPasteboard()
     }
     
-    func update() {
-        let pasteboard = NSPasteboard.generalPasteboard()
-        _currentItem = pasteboard.pasteboardItems?.first
+    func updateLocalItems() {
+        _currentItem = _pasteboard.pasteboardItems?.first
+    }
+    
+    func addReceivedItemWithRepresentations(reps: [(String, NSData)], forKey key: String) {
+        let pbItem = NSPasteboardItem()
+        
+        for rep in reps {
+            pbItem.setData(rep.1, forType: rep.0)
+        }
+        
+        _receivedItems[key] = pbItem
+    }
+    
+    func representationsForItem(item: NSPasteboardItem) -> [(String, NSData)] {
+        var reps: [(String, NSData)] = []
+        
+        for repType in item.types {
+            guard let repData = item.dataForType(repType) else {
+                NSLog("cannot get data for representation %@", repType)
+                continue
+            }
+            reps.append((repType, repData))
+        }
+        
+        return reps
+    }
+    
+    func makeCurrentReceivedItemWithKey(key: String) {
+        guard let item = _receivedItems[key] else {
+            return
+        }
+        
+        _pasteboard.clearContents()
+        if _pasteboard.writeObjects([item]) {
+            _receivedItems.removeValueForKey(key)
+        }
     }
     
     func viewForItem(item: NSPasteboardItem?, constrainedToSize maxSize: CGSize) -> NSView? {
