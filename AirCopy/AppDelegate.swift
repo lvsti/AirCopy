@@ -12,9 +12,7 @@ import Cocoa
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
 
-    @IBOutlet weak var statusMenu: NSMenu!
     var statusItem: NSStatusItem!
-    var currentPasteboardItems: [NSPasteboardItem] = []
     var menuController: MenuController!
 
     func applicationDidFinishLaunching(aNotification: NSNotification) {
@@ -24,11 +22,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         statusItem = statusBar.statusItemWithLength(NSVariableStatusItemLength)
         
         statusItem.title = "AirCopy"
-        statusItem.menu = statusMenu
+        statusItem.menu = NSMenu(title: statusItem.title!)
         
         NSMenu.setMenuBarVisible(false)
         
-        menuController = MenuController(menu: statusMenu, browser: ServiceBrowser(), pasteboardController: PasteboardController())
+        menuController = MenuController(
+            menu: statusItem.menu!,
+            browser: ServiceBrowser(),
+            pasteboardController: PasteboardController()
+        )
     }
 
     func applicationWillTerminate(aNotification: NSNotification) {
