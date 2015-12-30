@@ -59,7 +59,7 @@ class AirCopyService: NSObject, NSNetServiceDelegate, InboundTransferDelegate, O
 
     // MARK: - from NSNetServiceDelegate:
     
-    internal func netService(sender: NSNetService, didAcceptConnectionWithInputStream inputStream: NSInputStream, outputStream: NSOutputStream) {
+    func netService(sender: NSNetService, didAcceptConnectionWithInputStream inputStream: NSInputStream, outputStream: NSOutputStream) {
         NSLog("incoming connection")
         
         guard _inboundTransfers[sender] == nil else {
@@ -78,12 +78,12 @@ class AirCopyService: NSObject, NSNetServiceDelegate, InboundTransferDelegate, O
     
     // MARK: - from InboundTransferDelegate:
     
-    internal func inboundTransfer(transfer: InboundTransfer, didProduceItemWithRepresentations reps: [(String, NSData)]) {
+    func inboundTransfer(transfer: InboundTransfer, didProduceItemWithRepresentations reps: [(String, NSData)]) {
         var descriptor = _inboundTransfers[transfer.netService]!
         descriptor.1.append(reps)
     }
     
-    internal func inboundTransferDidEnd(transfer: InboundTransfer) {
+    func inboundTransferDidEnd(transfer: InboundTransfer) {
         let descriptor = _inboundTransfers[transfer.netService]!
         _inboundTransfers.removeValueForKey(transfer.netService)
         
@@ -94,7 +94,7 @@ class AirCopyService: NSObject, NSNetServiceDelegate, InboundTransferDelegate, O
     
     // MARK: - from OutboundTransferDelegate:
     
-    internal func outboundTransferDidEnd(transfer: OutboundTransfer) {
+    func outboundTransferDidEnd(transfer: OutboundTransfer) {
         _outboundTransfers.removeValueForKey(transfer.netService)
     }
     

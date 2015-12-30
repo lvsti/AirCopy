@@ -116,7 +116,7 @@ class MenuController: NSObject, ServiceBrowserDelegate, NSMenuDelegate, AirCopyS
     
     // MARK: - from AirCopyServiceDelegate:
     
-    internal func airCopyService(service: AirCopyService,
+    func airCopyService(service: AirCopyService,
         didReceivePasteboardItemsWithRepresentations items: [[(String, NSData)]],
         fromNetService netService: NSNetService) {
     }
