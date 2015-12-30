@@ -9,37 +9,52 @@
 import Foundation
 
 
-class AirCopyService: NSObject, NSNetServiceDelegate, InboundTransferDelegate {
+class AirCopyService: NSObject, NSNetServiceDelegate, InboundTransferDelegate, OutboundTransferDelegate {
     
     static let ServiceType = "_aircopy._tcp."
     
     private let _netService: NSNetService
-    private var _transfers: [NSNetService: InboundTransfer]
+    private var _inboundTransfers: [NSNetService: InboundTransfer]
+    private var _outboundTransfers: [NSNetService: OutboundTransfer]
     
     static let sharedService = AirCopyService()
     
     private override init() {
         _netService = NSNetService(domain: "", type: AirCopyService.ServiceType, name: "", port: 0)
-        _transfers = [:]
+        _inboundTransfers = [:]
+        _outboundTransfers = [:]
         super.init()
     }
     
-    func start() {
+    func startAcceptingConnections() {
         _netService.delegate = self
         _netService.publishWithOptions(.ListenForConnections)
     }
     
-    func stop() {
+    func stopAcceptingConnections() {
         _netService.delegate = nil
         _netService.stop()
     }
     
+    func sendPasteboardItemsWithRepresentations(reps: [[(String, NSData)]], toNetService netService: NSNetService) {
+        guard _outboundTransfers[netService] == nil else {
+            NSLog("simultaneous transfers to the same service are not supported")
+            return
+        }
+        
+        let transfer = OutboundTransfer(netService: netService, payload: reps)
+        transfer.delegate = self
+        _outboundTransfers[netService] = transfer
+        
+        transfer.start()
+    }
+
     // MARK: - from NSNetServiceDelegate:
     
-    func netService(sender: NSNetService, didAcceptConnectionWithInputStream inputStream: NSInputStream, outputStream: NSOutputStream) {
+    internal func netService(sender: NSNetService, didAcceptConnectionWithInputStream inputStream: NSInputStream, outputStream: NSOutputStream) {
         NSLog("incoming connection")
         
-        guard _transfers[sender] == nil else {
+        guard _inboundTransfers[sender] == nil else {
             NSLog("simultaneous transfers from the same service are not supported")
             return
         }
@@ -48,19 +63,25 @@ class AirCopyService: NSObject, NSNetServiceDelegate, InboundTransferDelegate {
         
         let transfer = InboundTransfer(netService: sender, inputStream: inputStream)
         transfer.delegate = self
-        _transfers[sender] = transfer
+        _inboundTransfers[sender] = transfer
         
         transfer.start()
     }
     
     // MARK: - from InboundTransferDelegate:
     
-    func inboundTransferDidProduceItemWithRepresentations(reps: [(String, NSData)]) {
+    internal func inboundTransferDidProduceItemWithRepresentations(reps: [(String, NSData)]) {
 //        NSLog("reps: %@", reps)
     }
     
-    func inboundTransferDidEnd(transfer: InboundTransfer) {
-        _transfers.removeValueForKey(transfer.netService)
+    internal func inboundTransferDidEnd(transfer: InboundTransfer) {
+        _inboundTransfers.removeValueForKey(transfer.netService)
+    }
+    
+    // MARK: - from OutboundTransferDelegate:
+    
+    internal func outboundTransferDidEnd(transfer: OutboundTransfer) {
+        _outboundTransfers.removeValueForKey(transfer.netService)
     }
     
 }

@@ -13,35 +13,37 @@ let kDefaultWidth: CGFloat = 250
 let kMaxItemHeight: CGFloat = 250
 
 
-class MenuController: NSObject, ServiceBrowserDelegate, NSMenuDelegate, OutboundTransferDelegate {
+class MenuController: NSObject, ServiceBrowserDelegate, NSMenuDelegate {
     // dependencies
+    private let _menu: NSMenu
+    private let _service: AirCopyService
     private let _browser: ServiceBrowser
     private let _pasteboardController: PasteboardController
-    private let _menu: NSMenu
 
     // state
     private let _previewItem: NSMenuItem
     private let _servicesHeaderItem: NSMenuItem
     private var _serviceItems: [NSMenuItem]
+    private let _incomingHeaderItem: NSMenuItem
+    private var _incomingItems: [NSMenuItem]
     private let _otherItems: [NSMenuItem]
     
-    private var _outboundTransfers: [NSNetService: OutboundTransfer]
-    
-    init(menu: NSMenu, browser: ServiceBrowser, pasteboardController: PasteboardController) {
+    init(menu: NSMenu, service: AirCopyService, browser: ServiceBrowser, pasteboardController: PasteboardController) {
         _menu = menu
+        _service = service
         _browser = browser
         _pasteboardController = pasteboardController
         
         _previewItem = NSMenuItem(title: "Clipboard is empty")
         _servicesHeaderItem = NSMenuItem(title: "No nearby devices")
         _serviceItems = []
+        _incomingHeaderItem = NSMenuItem(title: "Received clipboards")
+        _incomingItems = []
         _otherItems = [
             NSMenuItem(title: "Quit AirCopy", keyEquivalent: "q") { _ in
                 NSApplication.sharedApplication().terminate(nil)
             }
         ]
-        
-        _outboundTransfers = [:]
         
         super.init()
         
@@ -53,14 +55,17 @@ class MenuController: NSObject, ServiceBrowserDelegate, NSMenuDelegate, Outbound
         _menu.removeAllItems()
         
         _menu.addItem(_previewItem)
+        
         _menu.addItem(NSMenuItem.separatorItem())
-
         _menu.addItem(_servicesHeaderItem)
         for item in _serviceItems {
             _menu.addItem(item)
         }
-        _menu.addItem(NSMenuItem.separatorItem())
         
+        _menu.addItem(NSMenuItem.separatorItem())
+//        _incomingItems
+        
+        _menu.addItem(NSMenuItem.separatorItem())
         for item in _otherItems {
             _menu.addItem(item)
         }
@@ -70,15 +75,25 @@ class MenuController: NSObject, ServiceBrowserDelegate, NSMenuDelegate, Outbound
         _serviceItems.removeAll(keepCapacity: true)
         
         for service in services {
-            let item = NSMenuItem(title: service.name) { _ in
+            let menuItem = NSMenuItem(title: service.name) { [unowned self] _ in
                 guard let pasteboardItem = self._pasteboardController.currentItem else {
                     return
                 }
-                self.transferPasteboardItems([pasteboardItem], toNetService: service)
+                
+                var pbItemReps: [(String, NSData)] = []
+                for repType in pasteboardItem.types {
+                    guard let repData = pasteboardItem.dataForType(repType) else {
+                        NSLog("cannot get data for representation %@", repType)
+                        continue
+                    }
+                    pbItemReps.append((repType, repData))
+                }
+                
+                self._service.sendPasteboardItemsWithRepresentations([pbItemReps], toNetService: service)
             }
-            item.representedObject = service
-            item.indentationLevel = 1
-            _serviceItems.append(item)
+            
+            menuItem.indentationLevel = 1
+            _serviceItems.append(menuItem)
         }
         
         _servicesHeaderItem.title = services.count > 0 ? "Send clipboard contents to:" : "No nearby devices"
@@ -88,38 +103,10 @@ class MenuController: NSObject, ServiceBrowserDelegate, NSMenuDelegate, Outbound
         _previewItem.view = view
     }
     
-    func transferPasteboardItems(items: [NSPasteboardItem], toNetService netService: NSNetService) {
-        guard _outboundTransfers[netService] == nil else {
-            NSLog("simultaneous transfers to the same service are not supported")
-            return
-        }
-        
-        var payload: [[(String, NSData)]] = []
-        
-        for pbItem in items {
-            var pbItemReps: [(String, NSData)] = []
-            for repType in pbItem.types {
-                guard let repData = pbItem.dataForType(repType) else {
-                    NSLog("cannot get data for representation %@", repType)
-                    continue
-                }
-                pbItemReps.append((repType, repData))
-            }
-            
-            payload.append(pbItemReps)
-        }
-        
-        let transfer = OutboundTransfer(netService: netService, payload: payload)
-        transfer.delegate = self
-        _outboundTransfers[netService] = transfer
-        
-        transfer.start()
-    }
-    
     // MARK: - from NSMenuDelegate:
     
     func menuNeedsUpdate(menu: NSMenu) {
-        _pasteboardController.update()
+        _pasteboardController.updateLocalItems()
         let pasteboardPreview = _pasteboardController.viewForItem(_pasteboardController.currentItem,
             constrainedToSize: CGSize(width: kDefaultWidth, height: kMaxItemHeight))
         updatePreviewItemWithView(pasteboardPreview)
@@ -134,12 +121,6 @@ class MenuController: NSObject, ServiceBrowserDelegate, NSMenuDelegate, Outbound
     func serviceBrowserDidUpdateServices(browser: ServiceBrowser) {
         updateServiceItemsWithServices(browser.services)
         rebuildMenu()
-    }
-    
-    // MARK: - from OutboundTransferDelegate:
-    
-    func outboundTransferDidEnd(transfer: OutboundTransfer) {
-        _outboundTransfers.removeValueForKey(transfer.netService)
     }
     
 }

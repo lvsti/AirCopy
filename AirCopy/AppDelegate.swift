@@ -16,8 +16,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var menuController: MenuController!
 
     func applicationDidFinishLaunching(aNotification: NSNotification) {
-        AirCopyService.sharedService.start()
-
         let statusBar = NSStatusBar.systemStatusBar()
         statusItem = statusBar.statusItemWithLength(NSVariableStatusItemLength)
         
@@ -28,13 +26,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         menuController = MenuController(
             menu: statusItem.menu!,
+            service: AirCopyService.sharedService,
             browser: ServiceBrowser(),
             pasteboardController: PasteboardController()
         )
+
+        AirCopyService.sharedService.startAcceptingConnections()
     }
 
     func applicationWillTerminate(aNotification: NSNotification) {
-        AirCopyService.sharedService.stop()
+        AirCopyService.sharedService.stopAcceptingConnections()
     }
     
 }
