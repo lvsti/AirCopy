@@ -13,7 +13,7 @@ let kDefaultWidth: CGFloat = 250
 let kMaxItemHeight: CGFloat = 250
 
 
-class MenuController: NSObject, ServiceBrowserDelegate, NSMenuDelegate {
+class MenuController: NSObject, ServiceBrowserDelegate, NSMenuDelegate, OutboundTransferDelegate {
     // dependencies
     private let _browser: ServiceBrowser
     private let _pasteboardController: PasteboardController
@@ -24,6 +24,8 @@ class MenuController: NSObject, ServiceBrowserDelegate, NSMenuDelegate {
     private let _servicesHeaderItem: NSMenuItem
     private var _serviceItems: [NSMenuItem]
     private let _otherItems: [NSMenuItem]
+    
+    private var _outboundTransfers: [NSNetService: OutboundTransfer]
     
     init(menu: NSMenu, browser: ServiceBrowser, pasteboardController: PasteboardController) {
         _menu = menu
@@ -38,6 +40,8 @@ class MenuController: NSObject, ServiceBrowserDelegate, NSMenuDelegate {
                 NSApplication.sharedApplication().terminate(nil)
             }
         ]
+        
+        _outboundTransfers = [:]
         
         super.init()
         
@@ -67,7 +71,10 @@ class MenuController: NSObject, ServiceBrowserDelegate, NSMenuDelegate {
         
         for service in services {
             let item = NSMenuItem(title: service.name) { _ in
-                
+                guard let pasteboardItem = self._pasteboardController.currentItem else {
+                    return
+                }
+                self.transferPasteboardItems([pasteboardItem], toNetService: service)
             }
             item.representedObject = service
             item.indentationLevel = 1
@@ -79,6 +86,34 @@ class MenuController: NSObject, ServiceBrowserDelegate, NSMenuDelegate {
     
     func updatePreviewItemWithView(view: NSView?) {
         _previewItem.view = view
+    }
+    
+    func transferPasteboardItems(items: [NSPasteboardItem], toNetService netService: NSNetService) {
+        guard _outboundTransfers[netService] == nil else {
+            NSLog("simultaneous transfers to the same service are not supported")
+            return
+        }
+        
+        var payload: [[(String, NSData)]] = []
+        
+        for pbItem in items {
+            var pbItemReps: [(String, NSData)] = []
+            for repType in pbItem.types {
+                guard let repData = pbItem.dataForType(repType) else {
+                    NSLog("cannot get data for representation %@", repType)
+                    continue
+                }
+                pbItemReps.append((repType, repData))
+            }
+            
+            payload.append(pbItemReps)
+        }
+        
+        let transfer = OutboundTransfer(netService: netService, payload: payload)
+        transfer.delegate = self
+        _outboundTransfers[netService] = transfer
+        
+        transfer.start()
     }
     
     // MARK: - from NSMenuDelegate:
@@ -99,6 +134,12 @@ class MenuController: NSObject, ServiceBrowserDelegate, NSMenuDelegate {
     func serviceBrowserDidUpdateServices(browser: ServiceBrowser) {
         updateServiceItemsWithServices(browser.services)
         rebuildMenu()
+    }
+    
+    // MARK: - from OutboundTransferDelegate:
+    
+    func outboundTransferDidEnd(transfer: OutboundTransfer) {
+        _outboundTransfers.removeValueForKey(transfer.netService)
     }
     
 }
