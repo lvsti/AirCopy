@@ -75,6 +75,9 @@ class InboundTransfer: NSObject, NSStreamDelegate {
                 },
                 action: { [unowned self] in
                     self._repCount = UnsafePointer<UInt8>(self._incomingData.bytes).memory
+                    self._incomingData.replaceBytesInRange(NSMakeRange(0, 1),
+                                                           withBytes: UnsafePointer<Void>(),
+                                                           length: 0)
                 }
             )
         ]
