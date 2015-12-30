@@ -9,7 +9,7 @@
 import Foundation
 
 protocol InboundTransferDelegate: class {
-    func inboundTransferDidProduceItemWithRepresentations(reps: [(String, NSData)])
+    func inboundTransfer(transfer: InboundTransfer, didProduceItemWithRepresentations: [(String, NSData)])
     func inboundTransferDidEnd(transfer: InboundTransfer)
 }
 
@@ -177,7 +177,7 @@ class InboundTransfer: NSObject, NSStreamDelegate {
                     return self._repCount == 0
                 },
                 action: { [unowned self] () -> Void in
-                    self.delegate?.inboundTransferDidProduceItemWithRepresentations(self._itemReps)
+                    self.delegate?.inboundTransfer(self, didProduceItemWithRepresentations: self._itemReps)
                 }
             ),
             Transition(

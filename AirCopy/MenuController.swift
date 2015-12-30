@@ -13,7 +13,7 @@ let kDefaultWidth: CGFloat = 250
 let kMaxItemHeight: CGFloat = 250
 
 
-class MenuController: NSObject, ServiceBrowserDelegate, NSMenuDelegate {
+class MenuController: NSObject, ServiceBrowserDelegate, NSMenuDelegate, AirCopyServiceDelegate {
     // dependencies
     private let _menu: NSMenu
     private let _service: AirCopyService
@@ -121,6 +121,13 @@ class MenuController: NSObject, ServiceBrowserDelegate, NSMenuDelegate {
     func serviceBrowserDidUpdateServices(browser: ServiceBrowser) {
         updateServiceItemsWithServices(browser.services)
         rebuildMenu()
+    }
+    
+    // MARK: - from AirCopyServiceDelegate:
+    
+    internal func airCopyService(service: AirCopyService,
+        didReceivePasteboardItemsWithRepresentations items: [[(String, NSData)]],
+        fromNetService netService: NSNetService) {
     }
     
 }

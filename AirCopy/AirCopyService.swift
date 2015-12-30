@@ -9,13 +9,21 @@
 import Foundation
 
 
+protocol AirCopyServiceDelegate: class {
+    func airCopyService(service: AirCopyService,
+        didReceivePasteboardItemsWithRepresentations: [[(String, NSData)]],
+        fromNetService: NSNetService)
+}
+
 class AirCopyService: NSObject, NSNetServiceDelegate, InboundTransferDelegate, OutboundTransferDelegate {
     
     static let ServiceType = "_aircopy._tcp."
     
     private let _netService: NSNetService
-    private var _inboundTransfers: [NSNetService: InboundTransfer]
+    private var _inboundTransfers: [NSNetService: (InboundTransfer, [[(String, NSData)]])]
     private var _outboundTransfers: [NSNetService: OutboundTransfer]
+    
+    weak var delegate: AirCopyServiceDelegate? = nil
     
     static let sharedService = AirCopyService()
     
@@ -63,19 +71,25 @@ class AirCopyService: NSObject, NSNetServiceDelegate, InboundTransferDelegate, O
         
         let transfer = InboundTransfer(netService: sender, inputStream: inputStream)
         transfer.delegate = self
-        _inboundTransfers[sender] = transfer
+        _inboundTransfers[sender] = (transfer, [])
         
         transfer.start()
     }
     
     // MARK: - from InboundTransferDelegate:
     
-    internal func inboundTransferDidProduceItemWithRepresentations(reps: [(String, NSData)]) {
-//        NSLog("reps: %@", reps)
+    internal func inboundTransfer(transfer: InboundTransfer, didProduceItemWithRepresentations reps: [(String, NSData)]) {
+        var descriptor = _inboundTransfers[transfer.netService]!
+        descriptor.1.append(reps)
     }
     
     internal func inboundTransferDidEnd(transfer: InboundTransfer) {
+        let descriptor = _inboundTransfers[transfer.netService]!
         _inboundTransfers.removeValueForKey(transfer.netService)
+        
+        self.delegate?.airCopyService(self,
+            didReceivePasteboardItemsWithRepresentations: descriptor.1,
+            fromNetService: transfer.netService)
     }
     
     // MARK: - from OutboundTransferDelegate:
