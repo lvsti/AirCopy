@@ -8,9 +8,9 @@
 
 import Foundation
 
-protocol TransferDelegate: class {
-    func transferDidProduceItemWithContents(contents: [String: NSData])
-    func transferDidEnd(transfer: InboundTransfer)
+protocol InboundTransferDelegate: class {
+    func inboundTransferDidProduceItemWithRepresentations(reps: [(String, NSData)])
+    func inboundTransferDidEnd(transfer: InboundTransfer)
 }
 
 
@@ -22,7 +22,9 @@ enum InboundTransferState {
 
 
 class InboundTransfer: NSObject, NSStreamDelegate {
-    private let _service: NSNetService
+    private let _netService: NSNetService
+    var netService: NSNetService { return _netService }
+    
     private let _inputStream: NSInputStream
     
     private let _incomingData: NSMutableData
@@ -32,13 +34,13 @@ class InboundTransfer: NSObject, NSStreamDelegate {
     private var _expectedSize: UInt64 = 0
     private var _repCount: UInt8 = 0
     private var _itemType: String = ""
-    private var _itemContents: [String: NSData] = [:]
+    private var _itemReps: [(String, NSData)] = []
 
     private var _stateMachine: StateMachine<InboundTransferState>!
-    weak var delegate: TransferDelegate? = nil
+    weak var delegate: InboundTransferDelegate? = nil
     
-    init(service: NSNetService, inputStream: NSInputStream) {
-        _service = service
+    init(netService: NSNetService, inputStream: NSInputStream) {
+        _netService = netService
         _inputStream = inputStream
         _incomingData = NSMutableData()
         _chunk = UnsafeMutablePointer<UInt8>.alloc(InboundTransfer.ChunkSize)
@@ -99,7 +101,7 @@ class InboundTransfer: NSObject, NSStreamDelegate {
                 nextState: .Trap,
                 condition: { return false },
                 action: { [unowned self] () -> Void in
-                    self.delegate?.transferDidEnd(self)
+                    self.delegate?.inboundTransferDidEnd(self)
                 }
             )
         ]
@@ -159,7 +161,7 @@ class InboundTransfer: NSObject, NSStreamDelegate {
                 },
                 action: { [unowned self] in
                     let itemData = self._incomingData.subdataWithRange(NSMakeRange(0, Int(self._expectedSize)))
-                    self._itemContents[self._itemType] = itemData
+                    self._itemReps.append((self._itemType, itemData))
                     self._incomingData.replaceBytesInRange(NSMakeRange(0, Int(self._expectedSize)),
                                                            withBytes: UnsafePointer<Void>(),
                                                            length: 0)
@@ -175,7 +177,7 @@ class InboundTransfer: NSObject, NSStreamDelegate {
                     return self._repCount == 0
                 },
                 action: { [unowned self] () -> Void in
-                    self.delegate?.transferDidProduceItemWithContents(self._itemContents)
+                    self.delegate?.inboundTransferDidProduceItemWithRepresentations(self._itemReps)
                 }
             ),
             Transition(
@@ -195,7 +197,7 @@ class InboundTransfer: NSObject, NSStreamDelegate {
     func stream(stream: NSStream, handleEvent eventCode: NSStreamEvent) {
         guard eventCode != .EndEncountered else {
             stream.close()
-            delegate?.transferDidEnd(self)
+            delegate?.inboundTransferDidEnd(self)
             return
         }
 

@@ -9,51 +9,58 @@
 import Foundation
 
 
-class AirCopyService: NSObject, NSNetServiceDelegate, TransferDelegate {
+class AirCopyService: NSObject, NSNetServiceDelegate, InboundTransferDelegate {
     
     static let ServiceType = "_aircopy._tcp."
     
-    private let netService: NSNetService
-    private var transfers: Set<InboundTransfer>
+    private let _netService: NSNetService
+    private var _transfers: [NSNetService: InboundTransfer]
     
     static let sharedService = AirCopyService()
     
     private override init() {
-        netService = NSNetService(domain: "", type: AirCopyService.ServiceType, name: "", port: 0)
-        transfers = []
+        _netService = NSNetService(domain: "", type: AirCopyService.ServiceType, name: "", port: 0)
+        _transfers = [:]
         super.init()
     }
     
     func start() {
-        netService.delegate = self
-        netService.publishWithOptions(.ListenForConnections)
+        _netService.delegate = self
+        _netService.publishWithOptions(.ListenForConnections)
     }
     
     func stop() {
-        netService.delegate = nil
-        netService.stop()
+        _netService.delegate = nil
+        _netService.stop()
     }
     
     // MARK: - from NSNetServiceDelegate:
     
     func netService(sender: NSNetService, didAcceptConnectionWithInputStream inputStream: NSInputStream, outputStream: NSOutputStream) {
         NSLog("incoming connection")
+        
+        guard _transfers[sender] == nil else {
+            NSLog("simultaneous transfers from the same service are not supported")
+            return
+        }
+        
         inputStream.scheduleInRunLoop(NSRunLoop.currentRunLoop(), forMode: NSDefaultRunLoopMode)
-        let transfer = InboundTransfer(service: sender, inputStream: inputStream)
+        
+        let transfer = InboundTransfer(netService: sender, inputStream: inputStream)
         transfer.delegate = self
-        transfers.insert(transfer)
+        _transfers[sender] = transfer
         
         transfer.start()
     }
     
-    // MARK: - from TransferDelegate:
+    // MARK: - from InboundTransferDelegate:
     
-    func transferDidProduceItemWithContents(contents: [String : NSData]) {
-        NSLog("item: %@", contents)
+    func inboundTransferDidProduceItemWithRepresentations(reps: [(String, NSData)]) {
+//        NSLog("reps: %@", reps)
     }
     
-    func transferDidEnd(transfer: InboundTransfer) {
-        transfers.remove(transfer)
+    func inboundTransferDidEnd(transfer: InboundTransfer) {
+        _transfers.removeValueForKey(transfer.netService)
     }
     
 }
