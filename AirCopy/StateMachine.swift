@@ -27,7 +27,11 @@ class StateMachine<StateType: Hashable> {
     }
     
     func step() {
-        loop: while true {
+        var didTransition = true
+        
+        while didTransition {
+            didTransition = false
+            
             guard let possibleTransitions = transitions[_currentState] else {
                 return
             }
@@ -36,7 +40,7 @@ class StateMachine<StateType: Hashable> {
                 if transition.condition() {
                     _currentState = transition.nextState
                     transition.action()
-                    continue loop
+                    didTransition = true
                 }
             }
         }
