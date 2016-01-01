@@ -81,6 +81,7 @@ class AirCopyService: NSObject, NSNetServiceDelegate, InboundTransferDelegate, O
     func inboundTransfer(transfer: InboundTransfer, didProduceItemWithRepresentations reps: [(String, NSData)]) {
         var descriptor = _inboundTransfers[transfer.netService]!
         descriptor.1.append(reps)
+        _inboundTransfers[transfer.netService] = descriptor
     }
     
     func inboundTransferDidEnd(transfer: InboundTransfer) {
