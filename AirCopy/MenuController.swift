@@ -48,6 +48,9 @@ class MenuController: NSObject, ServiceBrowserDelegate, NSMenuDelegate, AirCopyS
     private func rebuildMenu() {
         _menuItems.removeAll(keepCapacity: true)
         
+        _visibleServiceCount = _browser.services.count
+        _visibleReceivedCount = _pasteboardController.receivedItems.count
+
         _menuItems.append(menuItemForPasteboardPreview())
         
         _menuItems.append(NSMenuItem.separatorItem())
@@ -71,9 +74,6 @@ class MenuController: NSObject, ServiceBrowserDelegate, NSMenuDelegate, AirCopyS
         _menuItems.append(NSMenuItem(title: "Quit AirCopy", keyEquivalent: "q") { _ in
             NSApplication.sharedApplication().terminate(nil)
         })
-        
-        _visibleServiceCount = _browser.services.count
-        _visibleReceivedCount = _pasteboardController.receivedItems.count
     }
     
     private func renderMenu() {
