@@ -20,10 +20,14 @@ class ServiceBrowser: NSObject, NSNetServiceBrowserDelegate {
     private var _services: [NSNetService] = []
     var services: [NSNetService] { return _services }
     
+    private var _isSearching: Bool
+    var isSearching: Bool { return _isSearching }
+    
     weak var delegate: ServiceBrowserDelegate? = nil
 
     override init() {
         _browser = NSNetServiceBrowser()
+        _isSearching = false
         
         super.init()
     }
@@ -31,6 +35,7 @@ class ServiceBrowser: NSObject, NSNetServiceBrowserDelegate {
     func start() {
         _browser.delegate = self
         _browser.stop()
+
         _pendingServices.removeAll(keepCapacity: true)
         _browser.searchForServicesOfType(AirCopyService.ServiceType, inDomain: "")
     }
@@ -48,6 +53,7 @@ class ServiceBrowser: NSObject, NSNetServiceBrowserDelegate {
     
         if !moreComing {
             _services = _pendingServices
+            _isSearching = false
             delegate?.serviceBrowserDidUpdateServices(self)
         }
     }
@@ -59,8 +65,17 @@ class ServiceBrowser: NSObject, NSNetServiceBrowserDelegate {
         
         if !moreComing {
             _services = _pendingServices
+            _isSearching = false
             delegate?.serviceBrowserDidUpdateServices(self)
         }
+    }
+    
+    func netServiceBrowserWillSearch(browser: NSNetServiceBrowser) {
+        _isSearching = true
+    }
+    
+    func netServiceBrowserDidStopSearch(browser: NSNetServiceBrowser) {
+        _isSearching = false
     }
     
 }
