@@ -23,7 +23,7 @@ class PasteboardController {
         _pasteboard = NSPasteboard.generalPasteboard()
     }
     
-    func updateLocalItems() {
+    func updateCurrentItem() {
         _currentItem = _pasteboard.pasteboardItems?.first
     }
     
@@ -60,6 +60,8 @@ class PasteboardController {
         if _pasteboard.writeObjects([item]) {
             _receivedItems.removeValueForKey(key)
         }
+        
+        updateCurrentItem()
     }
     
     func viewForItem(item: NSPasteboardItem?, constrainedToSize maxSize: CGSize) -> NSView? {
