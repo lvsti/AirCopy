@@ -106,7 +106,8 @@ class PasteboardController {
             view.bezeled = false
             view.stringValue = string
             
-            var fitSize = view.sizeThatFits(maxSize)
+            view.preferredMaxLayoutWidth = maxSize.width
+            var fitSize = view.intrinsicContentSize// view.sizeThatFits(maxSize)
             fitSize.width = maxSize.width
             fitSize.height = min(fitSize.height, maxSize.height)
             view.frame = NSRect(origin: CGPoint.zero, size: fitSize)
