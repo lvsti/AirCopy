@@ -37,6 +37,6 @@ extension NSMenuItem {
         let trampoline: ActionTrampoline<NSMenuItem>? = handler != nil ? ActionTrampoline<NSMenuItem>(action: handler!) : nil
         objc_setAssociatedObject(self, NSMenuItemHandlerTrampolineKey, trampoline, .OBJC_ASSOCIATION_RETAIN)
         self.target = trampoline
-        self.action = Selector("action:")
+        self.action = handler != nil ? Selector("action:") : nil
     }
 }
