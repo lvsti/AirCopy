@@ -61,7 +61,9 @@ class InboundTransfer: NSObject, NSStreamDelegate {
     }
     
     func start() {
-        _inputStream.open()
+        if _inputStream.streamStatus == NSStreamStatus.NotOpen {
+            _inputStream.open()
+        }
     }
     
     private func transitionMap() -> StateMachine<InboundTransferState>.TransitionMapType {
@@ -198,7 +200,7 @@ class InboundTransfer: NSObject, NSStreamDelegate {
     // from NSStreamDelegate:
  
     func stream(stream: NSStream, handleEvent eventCode: NSStreamEvent) {
-        guard eventCode != .EndEncountered else {
+        guard eventCode != .EndEncountered && eventCode != .ErrorOccurred else {
             stream.close()
             delegate?.inboundTransferDidEnd(self)
             return
@@ -209,6 +211,12 @@ class InboundTransfer: NSObject, NSStreamDelegate {
         }
 
         let count = _inputStream.read(_chunk, maxLength: InboundTransfer.ChunkSize)
+        guard count >= 0 else {
+            stream.close()
+            delegate?.inboundTransferDidEnd(self)
+            return
+        }
+        
         _incomingData.appendBytes(_chunk, length: count)
 
         _stateMachine.step()

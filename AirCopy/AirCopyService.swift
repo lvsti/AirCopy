@@ -50,13 +50,42 @@ class AirCopyService: NSObject, NSNetServiceDelegate, InboundTransferDelegate, O
             return
         }
         
-        let transfer = OutboundTransfer(netService: netService, payload: reps)
+        var os: NSOutputStream? = nil
+        guard
+            netService.getInputStream(nil, outputStream: &os),
+            let outputStream = os where os != nil
+        else {
+            return
+        }
+
+        outputStream.scheduleInRunLoop(NSRunLoop.mainRunLoop(), forMode: NSDefaultRunLoopMode)
+        configureSecureTransportForStream(outputStream)
+
+        let transfer = OutboundTransfer(netService: netService, outputStream: outputStream, payload: reps)
         transfer.delegate = self
         _outboundTransfers[netService] = transfer
         
         transfer.start()
     }
+    
+    // MARK: - private methods:
 
+    private func configureSecureTransportForStream(stream: NSStream) {
+//        stream.setProperty(NSStreamSocketSecurityLevelNegotiatedSSL, forKey: NSStreamSocketSecurityLevelKey)
+        
+//        let settings: [String: AnyObject] = [
+//            kCFStreamSSLValidatesCertificateChain as String: false,
+//            kCFStreamSSLPeerName as String: kCFNull
+//        ]
+//        
+//        if stream is NSInputStream {
+//            CFReadStreamSetProperty(stream as! NSInputStream, kCFStreamPropertySSLSettings, settings)
+//        }
+//        else if stream is NSOutputStream {
+//            CFWriteStreamSetProperty(stream as! NSOutputStream, kCFStreamPropertySSLSettings, settings)
+//        }
+    }
+    
     // MARK: - from NSNetServiceDelegate:
     
     func netService(sender: NSNetService, didAcceptConnectionWithInputStream inputStream: NSInputStream, outputStream: NSOutputStream) {
@@ -67,7 +96,8 @@ class AirCopyService: NSObject, NSNetServiceDelegate, InboundTransferDelegate, O
             return
         }
         
-        inputStream.scheduleInRunLoop(NSRunLoop.currentRunLoop(), forMode: NSDefaultRunLoopMode)
+        inputStream.scheduleInRunLoop(NSRunLoop.mainRunLoop(), forMode: NSDefaultRunLoopMode)
+        configureSecureTransportForStream(inputStream)
         
         let transfer = InboundTransfer(netService: sender, inputStream: inputStream)
         transfer.delegate = self

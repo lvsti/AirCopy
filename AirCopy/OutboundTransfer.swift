@@ -61,55 +61,86 @@ protocol OutboundTransferDelegate: class {
     func outboundTransferDidEnd(transfer: OutboundTransfer)
 }
 
-class OutboundTransfer {
+class OutboundTransfer: NSObject, NSStreamDelegate {
+    // dependencies
     private let _netService: NSNetService
     var netService: NSNetService { return _netService }
+    private let _outputStream: NSOutputStream
     
     private let _payload: [[(String, NSData)]]
+    
+    // state
+    private var _outgoingData: NSData!
+    private var _outgoingDataOffset: Int
     weak var delegate: OutboundTransferDelegate? = nil
     
-    init(netService: NSNetService, payload: [[(String, NSData)]]) {
+    init(netService: NSNetService, outputStream: NSOutputStream, payload: [[(String, NSData)]]) {
         _netService = netService
+        _outputStream = outputStream
         _payload = payload
+        
+        _outgoingDataOffset = 0
+        
+        super.init()
+        
+        _outputStream.delegate = self
     }
     
     func start() {
-        defer { self.delegate?.outboundTransferDidEnd(self) }
+        let dataStream = NSOutputStream.outputStreamToMemory()
+        dataStream.open()
         
-        var os: NSOutputStream? = nil
-        guard
-            _netService.getInputStream(nil, outputStream: &os),
-            let outputStream = os where os != nil
-        else {
-            return
-        }
-        
-        outputStream.open()
-
         do {
             for pbItemReps in _payload {
-                try outputStream.writeUInt8(UInt8(pbItemReps.count))
+                try dataStream.writeUInt8(UInt8(pbItemReps.count))
                 for (repType, repData) in pbItemReps {
-                    try outputStream.writeUTF8String(repType)
-                    try outputStream.writeData(repData)
+                    try dataStream.writeUTF8String(repType)
+                    try dataStream.writeData(repData)
                 }
             }
         }
         catch {
+            delegate?.outboundTransferDidEnd(self)
+            return
         }
-
-        outputStream.close()
+        
+        dataStream.close()
+        
+        guard let rawData = dataStream.propertyForKey(NSStreamDataWrittenToMemoryStreamKey) as? NSData else {
+            delegate?.outboundTransferDidEnd(self)
+            return
+        }
+        
+        _outgoingData = rawData
+        _outgoingDataOffset = 0
+        
+        if _outputStream.streamStatus == NSStreamStatus.NotOpen {
+            _outputStream.open()
+        }
     }
     
-}
-
-func == (lhs: OutboundTransfer, rhs: OutboundTransfer) -> Bool {
-    return lhs.netService == rhs.netService
-}
-
-extension OutboundTransfer: Hashable {
-    var hashValue: Int {
-        return _netService.hashValue
+    // MARK: - from NSStreamDelegate:
+    
+    func stream(stream: NSStream, handleEvent eventCode: NSStreamEvent) {
+        guard eventCode != .EndEncountered && eventCode != .ErrorOccurred else {
+            stream.close()
+            delegate?.outboundTransferDidEnd(self)
+            return
+        }
+        
+        guard eventCode == .HasSpaceAvailable else {
+            return
+        }
+        
+        let count = _outputStream.write(UnsafePointer<UInt8>(_outgoingData.bytes), maxLength: _outgoingData.length - _outgoingDataOffset)
+        guard count >= 0 else {
+            stream.close()
+            delegate?.outboundTransferDidEnd(self)
+            return
+        }
+        
+        _outgoingDataOffset += count
     }
+    
 }
 
