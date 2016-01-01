@@ -10,15 +10,42 @@
 		BE19464A1C3056EF00AB6E2F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1946491C3056EF00AB6E2F /* AppDelegate.swift */; };
 		BE19464C1C3056EF00AB6E2F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BE19464B1C3056EF00AB6E2F /* Assets.xcassets */; };
 		BE19464F1C3056EF00AB6E2F /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = BE19464D1C3056EF00AB6E2F /* MainMenu.xib */; };
-		BE1946571C30610E00AB6E2F /* AirCopyService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1946561C30610E00AB6E2F /* AirCopyService.swift */; };
-		BE3C83AF1C31EDB8001658E6 /* StateMachine.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE3C83AE1C31EDB8001658E6 /* StateMachine.swift */; };
-		BE3C83B11C31EF7C001658E6 /* InboundTransfer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE3C83B01C31EF7C001658E6 /* InboundTransfer.swift */; };
-		BE3C83B31C31F06A001658E6 /* ServiceBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE3C83B21C31F06A001658E6 /* ServiceBrowser.swift */; };
 		BE3C83B51C329233001658E6 /* MenuController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE3C83B41C329233001658E6 /* MenuController.swift */; };
 		BE3C83B71C329D88001658E6 /* NSMenuItem+Handler.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE3C83B61C329D88001658E6 /* NSMenuItem+Handler.swift */; };
-		BE3C83B91C32A6A7001658E6 /* OutboundTransfer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE3C83B81C32A6A7001658E6 /* OutboundTransfer.swift */; };
 		BE3C83BB1C32AAA1001658E6 /* PasteboardController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE3C83BA1C32AAA1001658E6 /* PasteboardController.swift */; };
+		BEB207D91C3704E400EE7346 /* AirCopyFramework.h in Headers */ = {isa = PBXBuildFile; fileRef = BEB207D81C3704E400EE7346 /* AirCopyFramework.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		BEB207DD1C3704E400EE7346 /* AirCopyFramework.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BEB207D61C3704E400EE7346 /* AirCopyFramework.framework */; };
+		BEB207DE1C3704E400EE7346 /* AirCopyFramework.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = BEB207D61C3704E400EE7346 /* AirCopyFramework.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		BED5D9531C3729970067EFBF /* AirCopyService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BED5D94E1C3729970067EFBF /* AirCopyService.swift */; };
+		BED5D9541C3729970067EFBF /* InboundTransfer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BED5D94F1C3729970067EFBF /* InboundTransfer.swift */; };
+		BED5D9551C3729970067EFBF /* OutboundTransfer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BED5D9501C3729970067EFBF /* OutboundTransfer.swift */; };
+		BED5D9561C3729970067EFBF /* AirCopyServiceBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = BED5D9511C3729970067EFBF /* AirCopyServiceBrowser.swift */; };
+		BED5D9571C3729970067EFBF /* StateMachine.swift in Sources */ = {isa = PBXBuildFile; fileRef = BED5D9521C3729970067EFBF /* StateMachine.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		BEB207DB1C3704E400EE7346 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BE19463E1C3056EF00AB6E2F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BEB207D51C3704E400EE7346;
+			remoteInfo = AirCopyFramework;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		BEB207E21C3704E400EE7346 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				BEB207DE1C3704E400EE7346 /* AirCopyFramework.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		BE1946461C3056EF00AB6E2F /* AirCopy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AirCopy.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -26,18 +53,29 @@
 		BE19464B1C3056EF00AB6E2F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		BE19464E1C3056EF00AB6E2F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		BE1946501C3056EF00AB6E2F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		BE1946561C30610E00AB6E2F /* AirCopyService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AirCopyService.swift; sourceTree = "<group>"; };
-		BE3C83AE1C31EDB8001658E6 /* StateMachine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StateMachine.swift; sourceTree = "<group>"; };
-		BE3C83B01C31EF7C001658E6 /* InboundTransfer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InboundTransfer.swift; sourceTree = "<group>"; };
-		BE3C83B21C31F06A001658E6 /* ServiceBrowser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ServiceBrowser.swift; sourceTree = "<group>"; };
 		BE3C83B41C329233001658E6 /* MenuController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MenuController.swift; sourceTree = "<group>"; };
 		BE3C83B61C329D88001658E6 /* NSMenuItem+Handler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSMenuItem+Handler.swift"; sourceTree = "<group>"; };
-		BE3C83B81C32A6A7001658E6 /* OutboundTransfer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OutboundTransfer.swift; sourceTree = "<group>"; };
 		BE3C83BA1C32AAA1001658E6 /* PasteboardController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PasteboardController.swift; sourceTree = "<group>"; };
+		BEB207D61C3704E400EE7346 /* AirCopyFramework.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = AirCopyFramework.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		BEB207D81C3704E400EE7346 /* AirCopyFramework.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AirCopyFramework.h; sourceTree = "<group>"; };
+		BEB207DA1C3704E400EE7346 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		BED5D94E1C3729970067EFBF /* AirCopyService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AirCopyService.swift; sourceTree = "<group>"; };
+		BED5D94F1C3729970067EFBF /* InboundTransfer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InboundTransfer.swift; sourceTree = "<group>"; };
+		BED5D9501C3729970067EFBF /* OutboundTransfer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OutboundTransfer.swift; sourceTree = "<group>"; };
+		BED5D9511C3729970067EFBF /* AirCopyServiceBrowser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AirCopyServiceBrowser.swift; sourceTree = "<group>"; };
+		BED5D9521C3729970067EFBF /* StateMachine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StateMachine.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		BE1946431C3056EF00AB6E2F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BEB207DD1C3704E400EE7346 /* AirCopyFramework.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BEB207D21C3704E400EE7346 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -51,6 +89,7 @@
 			isa = PBXGroup;
 			children = (
 				BE1946481C3056EF00AB6E2F /* AirCopy */,
+				BEB207D71C3704E400EE7346 /* AirCopyFramework */,
 				BE1946471C3056EF00AB6E2F /* Products */,
 			);
 			sourceTree = "<group>";
@@ -59,6 +98,7 @@
 			isa = PBXGroup;
 			children = (
 				BE1946461C3056EF00AB6E2F /* AirCopy.app */,
+				BEB207D61C3704E400EE7346 /* AirCopyFramework.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -66,41 +106,81 @@
 		BE1946481C3056EF00AB6E2F /* AirCopy */ = {
 			isa = PBXGroup;
 			children = (
-				BE1946561C30610E00AB6E2F /* AirCopyService.swift */,
 				BE1946491C3056EF00AB6E2F /* AppDelegate.swift */,
 				BE19464B1C3056EF00AB6E2F /* Assets.xcassets */,
-				BE3C83B01C31EF7C001658E6 /* InboundTransfer.swift */,
 				BE1946501C3056EF00AB6E2F /* Info.plist */,
 				BE19464D1C3056EF00AB6E2F /* MainMenu.xib */,
 				BE3C83B41C329233001658E6 /* MenuController.swift */,
 				BE3C83B61C329D88001658E6 /* NSMenuItem+Handler.swift */,
-				BE3C83B81C32A6A7001658E6 /* OutboundTransfer.swift */,
 				BE3C83BA1C32AAA1001658E6 /* PasteboardController.swift */,
-				BE3C83B21C31F06A001658E6 /* ServiceBrowser.swift */,
-				BE3C83AE1C31EDB8001658E6 /* StateMachine.swift */,
 			);
 			path = AirCopy;
 			sourceTree = "<group>";
 		};
+		BEB207D71C3704E400EE7346 /* AirCopyFramework */ = {
+			isa = PBXGroup;
+			children = (
+				BEB207D81C3704E400EE7346 /* AirCopyFramework.h */,
+				BED5D94E1C3729970067EFBF /* AirCopyService.swift */,
+				BED5D9511C3729970067EFBF /* AirCopyServiceBrowser.swift */,
+				BED5D94F1C3729970067EFBF /* InboundTransfer.swift */,
+				BEB207DA1C3704E400EE7346 /* Info.plist */,
+				BED5D9501C3729970067EFBF /* OutboundTransfer.swift */,
+				BED5D9521C3729970067EFBF /* StateMachine.swift */,
+			);
+			path = AirCopyFramework;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
+/* Begin PBXHeadersBuildPhase section */
+		BEB207D31C3704E400EE7346 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BEB207D91C3704E400EE7346 /* AirCopyFramework.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
 /* Begin PBXNativeTarget section */
-		BE1946451C3056EF00AB6E2F /* AirCopy */ = {
+		BE1946451C3056EF00AB6E2F /* AirCopy (OSX) */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = BE1946531C3056EF00AB6E2F /* Build configuration list for PBXNativeTarget "AirCopy" */;
+			buildConfigurationList = BE1946531C3056EF00AB6E2F /* Build configuration list for PBXNativeTarget "AirCopy (OSX)" */;
 			buildPhases = (
 				BE1946421C3056EF00AB6E2F /* Sources */,
 				BE1946431C3056EF00AB6E2F /* Frameworks */,
 				BE1946441C3056EF00AB6E2F /* Resources */,
+				BEB207E21C3704E400EE7346 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				BEB207DC1C3704E400EE7346 /* PBXTargetDependency */,
+			);
+			name = "AirCopy (OSX)";
+			productName = AirCopy;
+			productReference = BE1946461C3056EF00AB6E2F /* AirCopy.app */;
+			productType = "com.apple.product-type.application";
+		};
+		BEB207D51C3704E400EE7346 /* AirCopyFramework (OSX) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BEB207E11C3704E400EE7346 /* Build configuration list for PBXNativeTarget "AirCopyFramework (OSX)" */;
+			buildPhases = (
+				BEB207D11C3704E400EE7346 /* Sources */,
+				BEB207D21C3704E400EE7346 /* Frameworks */,
+				BEB207D31C3704E400EE7346 /* Headers */,
+				BEB207D41C3704E400EE7346 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
-			name = AirCopy;
-			productName = AirCopy;
-			productReference = BE1946461C3056EF00AB6E2F /* AirCopy.app */;
-			productType = "com.apple.product-type.application";
+			name = "AirCopyFramework (OSX)";
+			productName = AirCopyFramework;
+			productReference = BEB207D61C3704E400EE7346 /* AirCopyFramework.framework */;
+			productType = "com.apple.product-type.framework";
 		};
 /* End PBXNativeTarget section */
 
@@ -113,6 +193,9 @@
 				ORGANIZATIONNAME = "Tamas Lustyik";
 				TargetAttributes = {
 					BE1946451C3056EF00AB6E2F = {
+						CreatedOnToolsVersion = 7.2;
+					};
+					BEB207D51C3704E400EE7346 = {
 						CreatedOnToolsVersion = 7.2;
 					};
 				};
@@ -130,7 +213,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				BE1946451C3056EF00AB6E2F /* AirCopy */,
+				BE1946451C3056EF00AB6E2F /* AirCopy (OSX) */,
+				BEB207D51C3704E400EE7346 /* AirCopyFramework (OSX) */,
 			);
 		};
 /* End PBXProject section */
@@ -145,6 +229,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		BEB207D41C3704E400EE7346 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -152,19 +243,34 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BE3C83B11C31EF7C001658E6 /* InboundTransfer.swift in Sources */,
+				BED5D9541C3729970067EFBF /* InboundTransfer.swift in Sources */,
 				BE3C83BB1C32AAA1001658E6 /* PasteboardController.swift in Sources */,
+				BED5D9531C3729970067EFBF /* AirCopyService.swift in Sources */,
 				BE19464A1C3056EF00AB6E2F /* AppDelegate.swift in Sources */,
-				BE3C83AF1C31EDB8001658E6 /* StateMachine.swift in Sources */,
-				BE3C83B31C31F06A001658E6 /* ServiceBrowser.swift in Sources */,
+				BED5D9571C3729970067EFBF /* StateMachine.swift in Sources */,
+				BED5D9561C3729970067EFBF /* AirCopyServiceBrowser.swift in Sources */,
+				BED5D9551C3729970067EFBF /* OutboundTransfer.swift in Sources */,
 				BE3C83B51C329233001658E6 /* MenuController.swift in Sources */,
-				BE1946571C30610E00AB6E2F /* AirCopyService.swift in Sources */,
-				BE3C83B91C32A6A7001658E6 /* OutboundTransfer.swift in Sources */,
 				BE3C83B71C329D88001658E6 /* NSMenuItem+Handler.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		BEB207D11C3704E400EE7346 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		BEB207DC1C3704E400EE7346 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BEB207D51C3704E400EE7346 /* AirCopyFramework (OSX) */;
+			targetProxy = BEB207DB1C3704E400EE7346 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		BE19464D1C3056EF00AB6E2F /* MainMenu.xib */ = {
@@ -214,7 +320,8 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
@@ -252,7 +359,8 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
 			};
@@ -266,7 +374,7 @@
 				INFOPLIST_FILE = AirCopy/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = me.cocoagrinder.AirCopy;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = AirCopy;
 			};
 			name = Debug;
 		};
@@ -278,7 +386,52 @@
 				INFOPLIST_FILE = AirCopy/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = me.cocoagrinder.AirCopy;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = AirCopy;
+			};
+			name = Release;
+		};
+		BEB207DF1C3704E400EE7346 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_VERSION = A;
+				INFOPLIST_FILE = AirCopyFramework/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = me.cocoagrinder.AirCopyFramework;
+				PRODUCT_NAME = AirCopyFramework;
+				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		BEB207E01C3704E400EE7346 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_VERSION = A;
+				INFOPLIST_FILE = AirCopyFramework/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = me.cocoagrinder.AirCopyFramework;
+				PRODUCT_NAME = AirCopyFramework;
+				SKIP_INSTALL = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
 			};
 			name = Release;
 		};
@@ -294,11 +447,20 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		BE1946531C3056EF00AB6E2F /* Build configuration list for PBXNativeTarget "AirCopy" */ = {
+		BE1946531C3056EF00AB6E2F /* Build configuration list for PBXNativeTarget "AirCopy (OSX)" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				BE1946541C3056EF00AB6E2F /* Debug */,
 				BE1946551C3056EF00AB6E2F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		BEB207E11C3704E400EE7346 /* Build configuration list for PBXNativeTarget "AirCopyFramework (OSX)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BEB207DF1C3704E400EE7346 /* Debug */,
+				BEB207E01C3704E400EE7346 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

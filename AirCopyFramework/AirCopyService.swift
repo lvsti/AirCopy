@@ -9,13 +9,14 @@
 import Foundation
 
 
-protocol AirCopyServiceDelegate: class {
+public protocol AirCopyServiceDelegate: class {
     func airCopyService(service: AirCopyService,
         didReceivePasteboardItemsWithRepresentations: [[(String, NSData)]],
         fromNetService: NSNetService)
 }
 
-class AirCopyService: NSObject, NSNetServiceDelegate, InboundTransferDelegate, OutboundTransferDelegate {
+
+public class AirCopyService {
     
     static let ServiceType = "_aircopy._tcp."
     
@@ -23,28 +24,35 @@ class AirCopyService: NSObject, NSNetServiceDelegate, InboundTransferDelegate, O
     private var _inboundTransfers: [NSNetService: (InboundTransfer, [[(String, NSData)]])]
     private var _outboundTransfers: [NSNetService: OutboundTransfer]
     
-    weak var delegate: AirCopyServiceDelegate? = nil
+    private var _netServiceDelegateProxy: NetServiceDelegateProxy!
+    private var _inboundTransferDelegateProxy: InboundTransferDelegateProxy!
+    private var _outboundTransferDelegateProxy: OutboundTransferDelegateProxy!
     
-    static let sharedService = AirCopyService()
-    
-    private override init() {
+    public weak var delegate: AirCopyServiceDelegate? = nil
+
+    public static let sharedService = AirCopyService()
+
+    private init() {
         _netService = NSNetService(domain: "", type: AirCopyService.ServiceType, name: "", port: 0)
         _inboundTransfers = [:]
         _outboundTransfers = [:]
-        super.init()
+        
+        _netServiceDelegateProxy = NetServiceDelegateProxy(host: self)
+        _inboundTransferDelegateProxy = InboundTransferDelegateProxy(host: self)
+        _outboundTransferDelegateProxy = OutboundTransferDelegateProxy(host: self)
     }
     
-    func startAcceptingConnections() {
-        _netService.delegate = self
+    public func startAcceptingConnections() {
+        _netService.delegate = _netServiceDelegateProxy
         _netService.publishWithOptions(.ListenForConnections)
     }
     
-    func stopAcceptingConnections() {
+    public func stopAcceptingConnections() {
         _netService.delegate = nil
         _netService.stop()
     }
     
-    func sendPasteboardItemsWithRepresentations(reps: [[(String, NSData)]], toNetService netService: NSNetService) {
+    public func sendPasteboardItemsWithRepresentations(reps: [[(String, NSData)]], toNetService netService: NSNetService) {
         guard _outboundTransfers[netService] == nil else {
             NSLog("simultaneous transfers to the same service are not supported")
             return
@@ -63,7 +71,7 @@ class AirCopyService: NSObject, NSNetServiceDelegate, InboundTransferDelegate, O
         configureSecureTransportForStream(outputStream)
 
         let transfer = OutboundTransfer(netService: netService, outputStream: outputStream, payload: reps)
-        transfer.delegate = self
+        transfer.delegate = _outboundTransferDelegateProxy
         _outboundTransfers[netService] = transfer
         
         transfer.start()
@@ -77,7 +85,7 @@ class AirCopyService: NSObject, NSNetServiceDelegate, InboundTransferDelegate, O
     
     // MARK: - from NSNetServiceDelegate:
     
-    func netService(sender: NSNetService, didAcceptConnectionWithInputStream inputStream: NSInputStream, outputStream: NSOutputStream) {
+    private func netService(sender: NSNetService, didAcceptConnectionWithInputStream inputStream: NSInputStream, outputStream: NSOutputStream) {
         NSLog("incoming connection")
         
         guard _inboundTransfers[sender] == nil else {
@@ -89,7 +97,7 @@ class AirCopyService: NSObject, NSNetServiceDelegate, InboundTransferDelegate, O
         configureSecureTransportForStream(inputStream)
         
         let transfer = InboundTransfer(netService: sender, inputStream: inputStream)
-        transfer.delegate = self
+        transfer.delegate = _inboundTransferDelegateProxy
         _inboundTransfers[sender] = (transfer, [])
         
         transfer.start()
@@ -97,13 +105,13 @@ class AirCopyService: NSObject, NSNetServiceDelegate, InboundTransferDelegate, O
     
     // MARK: - from InboundTransferDelegate:
     
-    func inboundTransfer(transfer: InboundTransfer, didProduceItemWithRepresentations reps: [(String, NSData)]) {
+    private func inboundTransfer(transfer: InboundTransfer, didProduceItemWithRepresentations reps: [(String, NSData)]) {
         var descriptor = _inboundTransfers[transfer.netService]!
         descriptor.1.append(reps)
         _inboundTransfers[transfer.netService] = descriptor
     }
     
-    func inboundTransferDidEnd(transfer: InboundTransfer) {
+    private func inboundTransferDidEnd(transfer: InboundTransfer) {
         let descriptor = _inboundTransfers[transfer.netService]!
         _inboundTransfers.removeValueForKey(transfer.netService)
         
@@ -113,9 +121,48 @@ class AirCopyService: NSObject, NSNetServiceDelegate, InboundTransferDelegate, O
     }
     
     // MARK: - from OutboundTransferDelegate:
-    
-    func outboundTransferDidEnd(transfer: OutboundTransfer) {
+
+    private func outboundTransferDidEnd(transfer: OutboundTransfer) {
         _outboundTransfers.removeValueForKey(transfer.netService)
     }
     
 }
+
+
+class NetServiceDelegateProxy: NSObject, NSNetServiceDelegate {
+    weak var _host: AirCopyService?
+    init(host: AirCopyService) {
+        _host = host
+    }
+    
+    func netService(sender: NSNetService, didAcceptConnectionWithInputStream inputStream: NSInputStream, outputStream: NSOutputStream) {
+        _host?.netService(sender, didAcceptConnectionWithInputStream: inputStream, outputStream: outputStream)
+    }
+}
+
+class InboundTransferDelegateProxy: InboundTransferDelegate {
+    weak var _host: AirCopyService?
+    init(host: AirCopyService) {
+        _host = host
+    }
+    
+    func inboundTransfer(transfer: InboundTransfer, didProduceItemWithRepresentations reps: [(String, NSData)]) {
+        _host?.inboundTransfer(transfer, didProduceItemWithRepresentations: reps)
+    }
+    
+    func inboundTransferDidEnd(transfer: InboundTransfer) {
+        _host?.inboundTransferDidEnd(transfer)
+    }
+}
+
+class OutboundTransferDelegateProxy: OutboundTransferDelegate {
+    weak var _host: AirCopyService?
+    init(host: AirCopyService) {
+        _host = host
+    }
+    
+    func outboundTransferDidEnd(transfer: OutboundTransfer) {
+        _host?.outboundTransferDidEnd(transfer)
+    }
+}
+
