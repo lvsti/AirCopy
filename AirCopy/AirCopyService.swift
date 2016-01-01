@@ -50,10 +50,11 @@ class AirCopyService: NSObject, NSNetServiceDelegate, InboundTransferDelegate, O
             return
         }
         
-        var os: NSOutputStream? = nil
+        var ins: NSInputStream? = nil
+        var outs: NSOutputStream? = nil
         guard
-            netService.getInputStream(nil, outputStream: &os),
-            let outputStream = os where os != nil
+            netService.getInputStream(&ins, outputStream: &outs),
+            let outputStream = outs where outs != nil
         else {
             return
         }
@@ -71,19 +72,7 @@ class AirCopyService: NSObject, NSNetServiceDelegate, InboundTransferDelegate, O
     // MARK: - private methods:
 
     private func configureSecureTransportForStream(stream: NSStream) {
-//        stream.setProperty(NSStreamSocketSecurityLevelNegotiatedSSL, forKey: NSStreamSocketSecurityLevelKey)
-        
-//        let settings: [String: AnyObject] = [
-//            kCFStreamSSLValidatesCertificateChain as String: false,
-//            kCFStreamSSLPeerName as String: kCFNull
-//        ]
-//        
-//        if stream is NSInputStream {
-//            CFReadStreamSetProperty(stream as! NSInputStream, kCFStreamPropertySSLSettings, settings)
-//        }
-//        else if stream is NSOutputStream {
-//            CFWriteStreamSetProperty(stream as! NSOutputStream, kCFStreamPropertySSLSettings, settings)
-//        }
+        stream.setProperty(NSStreamSocketSecurityLevelNegotiatedSSL, forKey: NSStreamSocketSecurityLevelKey)
     }
     
     // MARK: - from NSNetServiceDelegate:
