@@ -64,6 +64,10 @@ class PasteboardController {
         updateCurrentItem()
     }
     
+    func deleteReceiveItemWithKey(key: String) {
+        _receivedItems.removeValueForKey(key)
+    }
+    
     func viewForItem(item: NSPasteboardItem?, constrainedToSize maxSize: CGSize) -> NSView? {
         guard
             let item = item,

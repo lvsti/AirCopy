@@ -123,14 +123,19 @@ class MenuController: NSObject, ServiceBrowserDelegate, NSMenuDelegate, AirCopyS
         previewItem.view = _pasteboardController.viewForItem(pbItem,
             constrainedToSize: CGSize(width: kDefaultWidth, height: kMaxItemHeight))
         
-        let acceptItem = NSMenuItem(title: "Accept")  { [unowned self] _ in
+        let applyItem = NSMenuItem(title: "Apply")  { [unowned self] _ in
             self._pasteboardController.makeCurrentReceivedItemWithKey(key)
+            self.rebuildMenu()
+        }
+        let deleteItem = NSMenuItem(title: "Delete")  { [unowned self] _ in
+            self._pasteboardController.deleteReceiveItemWithKey(key)
             self.rebuildMenu()
         }
         
         let submenu = NSMenu(title: key)
         submenu.addItem(previewItem)
-        submenu.addItem(acceptItem)
+        submenu.addItem(applyItem)
+        submenu.addItem(deleteItem)
         
         let menuItem = NSMenuItem(title: key)
         menuItem.submenu = submenu
