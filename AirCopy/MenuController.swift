@@ -8,16 +8,17 @@
 
 import Foundation
 import AppKit
+import AirCopyFramework
 
 let kDefaultWidth: CGFloat = 250
 let kMaxItemHeight: CGFloat = 250
 let kSearchStatusChangeTreshold: NSTimeInterval = 1.0
 
-class MenuController: NSObject, ServiceBrowserDelegate, NSMenuDelegate, AirCopyServiceDelegate {
+class MenuController: NSObject, NSMenuDelegate, AirCopyServiceBrowserDelegate, AirCopyServiceDelegate {
     // dependencies
     private let _menu: NSMenu
     private let _service: AirCopyService
-    private let _browser: ServiceBrowser
+    private let _browser: AirCopyServiceBrowser
     private let _pasteboardController: PasteboardController
 
     // state
@@ -28,7 +29,7 @@ class MenuController: NSObject, ServiceBrowserDelegate, NSMenuDelegate, AirCopyS
     private var _visibleServiceCount: Int
     private var _visibleReceivedCount: Int
     
-    init(menu: NSMenu, service: AirCopyService, browser: ServiceBrowser, pasteboardController: PasteboardController) {
+    init(menu: NSMenu, service: AirCopyService, browser: AirCopyServiceBrowser, pasteboardController: PasteboardController) {
         _menu = menu
         _service = service
         _browser = browser
@@ -172,9 +173,9 @@ class MenuController: NSObject, ServiceBrowserDelegate, NSMenuDelegate, AirCopyS
         renderMenu()
     }
     
-    // MARK: - from ServiceBrowserDelegate:
+    // MARK: - from AirCopyServiceBrowserDelegate:
     
-    func serviceBrowserDidUpdateServices(browser: ServiceBrowser) {
+    func airCopyServiceBrowserDidUpdateServices(browser: AirCopyServiceBrowser) {
         let elapsed = NSDate().timeIntervalSinceDate(_searchStartDate!)
         if elapsed > kSearchStatusChangeTreshold {
             updateMenu()

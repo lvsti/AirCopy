@@ -7,6 +7,7 @@
 //
 
 import Cocoa
+import AirCopyFramework
 
 
 @NSApplicationMain
@@ -27,7 +28,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         menuController = MenuController(
             menu: statusItem.menu!,
             service: AirCopyService.sharedService,
-            browser: ServiceBrowser(),
+            browser: AirCopyServiceBrowser(),
             pasteboardController: PasteboardController()
         )
 
