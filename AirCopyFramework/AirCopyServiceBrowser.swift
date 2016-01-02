@@ -49,7 +49,7 @@ public class AirCopyServiceBrowser {
     // MARK: - NSNetServiceBrowserDelegate:
     
     private func netServiceBrowser(browser: NSNetServiceBrowser, didFindService service: NSNetService, moreComing: Bool) {
-        if let hostname = NSHost.currentHost().localizedName where service.name != hostname {
+        if service.name != AirCopyService.sharedService.publishedName {
             _pendingServices.append(service)
         }
     

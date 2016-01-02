@@ -28,6 +28,8 @@ public class AirCopyService {
     private var _inboundTransferDelegateProxy: InboundTransferDelegateProxy!
     private var _outboundTransferDelegateProxy: OutboundTransferDelegateProxy!
     
+    public var publishedName: String? = nil
+    
     public weak var delegate: AirCopyServiceDelegate? = nil
 
     public static let sharedService = AirCopyService()
@@ -48,6 +50,7 @@ public class AirCopyService {
     }
     
     public func stopAcceptingConnections() {
+        publishedName = nil
         _netService.delegate = nil
         _netService.stop()
     }
@@ -84,6 +87,10 @@ public class AirCopyService {
     }
     
     // MARK: - from NSNetServiceDelegate:
+    
+    private func netServiceDidPublish(sender: NSNetService) {
+        publishedName = sender.name
+    }
     
     private func netService(sender: NSNetService, didAcceptConnectionWithInputStream inputStream: NSInputStream, outputStream: NSOutputStream) {
         NSLog("incoming connection")
@@ -133,6 +140,10 @@ class NetServiceDelegateProxy: NSObject, NSNetServiceDelegate {
     weak var _host: AirCopyService?
     init(host: AirCopyService) {
         _host = host
+    }
+    
+    func netServiceDidPublish(sender: NSNetService) {
+        _host?.netServiceDidPublish(sender)
     }
     
     func netService(sender: NSNetService, didAcceptConnectionWithInputStream inputStream: NSInputStream, outputStream: NSOutputStream) {
