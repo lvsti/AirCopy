@@ -16,11 +16,16 @@
 		BEB207D91C3704E400EE7346 /* AirCopyFramework.h in Headers */ = {isa = PBXBuildFile; fileRef = BEB207D81C3704E400EE7346 /* AirCopyFramework.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BEB207DD1C3704E400EE7346 /* AirCopyFramework.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BEB207D61C3704E400EE7346 /* AirCopyFramework.framework */; };
 		BEB207DE1C3704E400EE7346 /* AirCopyFramework.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = BEB207D61C3704E400EE7346 /* AirCopyFramework.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		BED5D9531C3729970067EFBF /* AirCopyService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BED5D94E1C3729970067EFBF /* AirCopyService.swift */; };
-		BED5D9541C3729970067EFBF /* InboundTransfer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BED5D94F1C3729970067EFBF /* InboundTransfer.swift */; };
-		BED5D9551C3729970067EFBF /* OutboundTransfer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BED5D9501C3729970067EFBF /* OutboundTransfer.swift */; };
-		BED5D9561C3729970067EFBF /* AirCopyServiceBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = BED5D9511C3729970067EFBF /* AirCopyServiceBrowser.swift */; };
-		BED5D9571C3729970067EFBF /* StateMachine.swift in Sources */ = {isa = PBXBuildFile; fileRef = BED5D9521C3729970067EFBF /* StateMachine.swift */; };
+		BED5D9701C38020F0067EFBF /* AirCopyService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BED5D94E1C3729970067EFBF /* AirCopyService.swift */; };
+		BED5D9711C38020F0067EFBF /* AirCopyServiceBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = BED5D9511C3729970067EFBF /* AirCopyServiceBrowser.swift */; };
+		BED5D9721C38020F0067EFBF /* InboundTransfer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BED5D94F1C3729970067EFBF /* InboundTransfer.swift */; };
+		BED5D9731C38020F0067EFBF /* OutboundTransfer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BED5D9501C3729970067EFBF /* OutboundTransfer.swift */; };
+		BED5D9741C38020F0067EFBF /* StateMachine.swift in Sources */ = {isa = PBXBuildFile; fileRef = BED5D9521C3729970067EFBF /* StateMachine.swift */; };
+		BED5D9751C3802100067EFBF /* AirCopyService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BED5D94E1C3729970067EFBF /* AirCopyService.swift */; };
+		BED5D9761C3802100067EFBF /* AirCopyServiceBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = BED5D9511C3729970067EFBF /* AirCopyServiceBrowser.swift */; };
+		BED5D9771C3802100067EFBF /* InboundTransfer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BED5D94F1C3729970067EFBF /* InboundTransfer.swift */; };
+		BED5D9781C3802100067EFBF /* OutboundTransfer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BED5D9501C3729970067EFBF /* OutboundTransfer.swift */; };
+		BED5D9791C3802100067EFBF /* StateMachine.swift in Sources */ = {isa = PBXBuildFile; fileRef = BED5D9521C3729970067EFBF /* StateMachine.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -64,6 +69,7 @@
 		BED5D9501C3729970067EFBF /* OutboundTransfer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OutboundTransfer.swift; sourceTree = "<group>"; };
 		BED5D9511C3729970067EFBF /* AirCopyServiceBrowser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AirCopyServiceBrowser.swift; sourceTree = "<group>"; };
 		BED5D9521C3729970067EFBF /* StateMachine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StateMachine.swift; sourceTree = "<group>"; };
+		BED5D9681C38017E0067EFBF /* AirCopyFramework.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = AirCopyFramework.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -76,6 +82,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		BEB207D21C3704E400EE7346 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BED5D9641C38017E0067EFBF /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -99,6 +112,7 @@
 			children = (
 				BE1946461C3056EF00AB6E2F /* AirCopy.app */,
 				BEB207D61C3704E400EE7346 /* AirCopyFramework.framework */,
+				BED5D9681C38017E0067EFBF /* AirCopyFramework.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -142,6 +156,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		BED5D9651C38017E0067EFBF /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
@@ -182,6 +203,24 @@
 			productReference = BEB207D61C3704E400EE7346 /* AirCopyFramework.framework */;
 			productType = "com.apple.product-type.framework";
 		};
+		BED5D9671C38017E0067EFBF /* AirCopyFramework (iOS) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BED5D96D1C38017E0067EFBF /* Build configuration list for PBXNativeTarget "AirCopyFramework (iOS)" */;
+			buildPhases = (
+				BED5D9631C38017E0067EFBF /* Sources */,
+				BED5D9641C38017E0067EFBF /* Frameworks */,
+				BED5D9651C38017E0067EFBF /* Headers */,
+				BED5D9661C38017E0067EFBF /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "AirCopyFramework (iOS)";
+			productName = "AirCopyFramework (iOS)";
+			productReference = BED5D9681C38017E0067EFBF /* AirCopyFramework.framework */;
+			productType = "com.apple.product-type.framework";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -196,6 +235,9 @@
 						CreatedOnToolsVersion = 7.2;
 					};
 					BEB207D51C3704E400EE7346 = {
+						CreatedOnToolsVersion = 7.2;
+					};
+					BED5D9671C38017E0067EFBF = {
 						CreatedOnToolsVersion = 7.2;
 					};
 				};
@@ -215,6 +257,7 @@
 			targets = (
 				BE1946451C3056EF00AB6E2F /* AirCopy (OSX) */,
 				BEB207D51C3704E400EE7346 /* AirCopyFramework (OSX) */,
+				BED5D9671C38017E0067EFBF /* AirCopyFramework (iOS) */,
 			);
 		};
 /* End PBXProject section */
@@ -236,6 +279,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		BED5D9661C38017E0067EFBF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -243,13 +293,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BED5D9541C3729970067EFBF /* InboundTransfer.swift in Sources */,
 				BE3C83BB1C32AAA1001658E6 /* PasteboardController.swift in Sources */,
-				BED5D9531C3729970067EFBF /* AirCopyService.swift in Sources */,
 				BE19464A1C3056EF00AB6E2F /* AppDelegate.swift in Sources */,
-				BED5D9571C3729970067EFBF /* StateMachine.swift in Sources */,
-				BED5D9561C3729970067EFBF /* AirCopyServiceBrowser.swift in Sources */,
-				BED5D9551C3729970067EFBF /* OutboundTransfer.swift in Sources */,
 				BE3C83B51C329233001658E6 /* MenuController.swift in Sources */,
 				BE3C83B71C329D88001658E6 /* NSMenuItem+Handler.swift in Sources */,
 			);
@@ -259,6 +304,23 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BED5D9721C38020F0067EFBF /* InboundTransfer.swift in Sources */,
+				BED5D9711C38020F0067EFBF /* AirCopyServiceBrowser.swift in Sources */,
+				BED5D9731C38020F0067EFBF /* OutboundTransfer.swift in Sources */,
+				BED5D9741C38020F0067EFBF /* StateMachine.swift in Sources */,
+				BED5D9701C38020F0067EFBF /* AirCopyService.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BED5D9631C38017E0067EFBF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BED5D9771C3802100067EFBF /* InboundTransfer.swift in Sources */,
+				BED5D9761C3802100067EFBF /* AirCopyServiceBrowser.swift in Sources */,
+				BED5D9781C3802100067EFBF /* OutboundTransfer.swift in Sources */,
+				BED5D9791C3802100067EFBF /* StateMachine.swift in Sources */,
+				BED5D9751C3802100067EFBF /* AirCopyService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -320,7 +382,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.4;
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -359,7 +421,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.4;
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
@@ -371,6 +433,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
+				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
 				INFOPLIST_FILE = AirCopy/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = me.cocoagrinder.AirCopy;
@@ -383,6 +446,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
+				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
 				INFOPLIST_FILE = AirCopy/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = me.cocoagrinder.AirCopy;
@@ -435,6 +499,51 @@
 			};
 			name = Release;
 		};
+		BED5D96E1C38017E0067EFBF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = AirCopyFramework/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = me.cocoagrinder.AirCopyFramework;
+				PRODUCT_NAME = AirCopyFramework;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		BED5D96F1C38017E0067EFBF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = AirCopyFramework/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = me.cocoagrinder.AirCopyFramework;
+				PRODUCT_NAME = AirCopyFramework;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -464,6 +573,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		BED5D96D1C38017E0067EFBF /* Build configuration list for PBXNativeTarget "AirCopyFramework (iOS)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BED5D96E1C38017E0067EFBF /* Debug */,
+				BED5D96F1C38017E0067EFBF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 /* End XCConfigurationList section */
 	};
