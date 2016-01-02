@@ -20,7 +20,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let statusBar = NSStatusBar.systemStatusBar()
         statusItem = statusBar.statusItemWithLength(NSVariableStatusItemLength)
         
-        statusItem.title = "AirCopy"
+        statusItem.image = NSImage(named: "statusicon")
+        statusItem.alternateImage = NSImage(named: "statusicon_inverted")
         statusItem.menu = NSMenu(title: statusItem.title!)
         
         NSMenu.setMenuBarVisible(false)
