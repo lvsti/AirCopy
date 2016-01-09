@@ -26,6 +26,8 @@
 		BED5D9771C3802100067EFBF /* InboundTransfer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BED5D94F1C3729970067EFBF /* InboundTransfer.swift */; };
 		BED5D9781C3802100067EFBF /* OutboundTransfer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BED5D9501C3729970067EFBF /* OutboundTransfer.swift */; };
 		BED5D9791C3802100067EFBF /* StateMachine.swift in Sources */ = {isa = PBXBuildFile; fileRef = BED5D9521C3729970067EFBF /* StateMachine.swift */; };
+		E8CCF4B51C41CC3B00AFDF91 /* Cutis.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8CCF4B41C41CC3B00AFDF91 /* Cutis.framework */; };
+		E8CCF4B61C41CC4500AFDF91 /* Cutis.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = E8CCF4B41C41CC3B00AFDF91 /* Cutis.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -45,6 +47,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				E8CCF4B61C41CC4500AFDF91 /* Cutis.framework in Embed Frameworks */,
 				BEB207DE1C3704E400EE7346 /* AirCopyFramework.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
@@ -71,6 +74,7 @@
 		BED5D9521C3729970067EFBF /* StateMachine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StateMachine.swift; sourceTree = "<group>"; };
 		BED5D9681C38017E0067EFBF /* AirCopyFramework.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = AirCopyFramework.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E889490C1C387DA7007B2A50 /* AirCopy.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = AirCopy.entitlements; sourceTree = "<group>"; };
+		E8CCF4B41C41CC3B00AFDF91 /* Cutis.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cutis.framework; path = Carthage/Build/Mac/Cutis.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -79,6 +83,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BEB207DD1C3704E400EE7346 /* AirCopyFramework.framework in Frameworks */,
+				E8CCF4B51C41CC3B00AFDF91 /* Cutis.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -102,6 +107,7 @@
 		BE19463D1C3056EF00AB6E2F = {
 			isa = PBXGroup;
 			children = (
+				E8CCF4B41C41CC3B00AFDF91 /* Cutis.framework */,
 				E889490C1C387DA7007B2A50 /* AirCopy.entitlements */,
 				BE1946481C3056EF00AB6E2F /* AirCopy */,
 				BEB207D71C3704E400EE7346 /* AirCopyFramework */,
@@ -443,6 +449,10 @@
 				CODE_SIGN_ENTITLEMENTS = AirCopy.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/Mac",
+				);
 				INFOPLIST_FILE = AirCopy/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = me.cocoagrinder.AirCopy;
@@ -457,6 +467,10 @@
 				CODE_SIGN_ENTITLEMENTS = AirCopy.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/Mac",
+				);
 				INFOPLIST_FILE = AirCopy/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = me.cocoagrinder.AirCopy;
