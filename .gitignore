@@ -16,3 +16,6 @@ profile
 
 .DS_Store
 Java/*
+
+Carthage/*
+Cartfile.resolved
