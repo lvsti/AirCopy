@@ -132,7 +132,8 @@ class OutboundTransfer: NSObject, NSStreamDelegate {
             return
         }
         
-        let count = _outputStream.write(UnsafePointer<UInt8>(_outgoingData.bytes), maxLength: _outgoingData.length - _outgoingDataOffset)
+        let count = _outputStream.write(UnsafePointer<UInt8>(_outgoingData.bytes).advancedBy(_outgoingDataOffset),
+            maxLength: _outgoingData.length - _outgoingDataOffset)
         guard count >= 0 else {
             stream.close()
             delegate?.outboundTransferDidEnd(self)
