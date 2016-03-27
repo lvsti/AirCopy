@@ -9,6 +9,7 @@
 import Foundation
 import AppKit
 import AirCopyFramework
+import Cutis
 
 let kDefaultWidth: CGFloat = 250
 let kMaxItemHeight: CGFloat = 250
@@ -89,10 +90,24 @@ class MenuController: NSObject, NSMenuDelegate, AirCopyServiceBrowserDelegate, A
     }
 
     private func menuItemForPasteboardPreview() -> NSMenuItem {
-        let menuItem = NSMenuItem(title: "Clipboard is empty")
         _pasteboardController.updateCurrentItem()
-        menuItem.view = _pasteboardController.viewForItem(_pasteboardController.currentItem,
+        let item = _pasteboardController.currentItem
+        let preview = _pasteboardController.viewForItem(item,
             constrainedToSize: CGSize(width: kDefaultWidth, height: kMaxItemHeight))
+        
+        let menuItem = NSMenuItem(title: "Clipboard is empty")
+        menuItem.view = preview
+
+        if item != nil && preview == nil {
+            if let itemType = item?.types.first,
+               let dec = UTType(itemType).declaration,
+               let desc = dec.typeDescription {
+                menuItem.title = "No preview available for " + desc
+            }
+            else {
+                menuItem.title = "No preview available"
+            }
+        }
         
         return menuItem
     }
