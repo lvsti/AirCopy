@@ -102,7 +102,7 @@ class MenuController: NSObject, NSMenuDelegate, AirCopyServiceBrowserDelegate, A
             return "Searching..."
         }
         
-        return _visibleServiceCount > 0 ? "Send clipboard contents to:" : "No nearby devices"
+        return _visibleServiceCount > 0 ? "Send clipboard contents to:" : "No nearby computers"
     }
     
     private func titleForReceivedStatusMenuItem() -> String {
