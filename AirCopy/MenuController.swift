@@ -58,7 +58,11 @@ class MenuController: NSObject, NSMenuDelegate, AirCopyServiceBrowserDelegate, A
         _searchStatusMenuItem = NSMenuItem(title: titleForSearchStatusMenuItem())
         _menuItems.append(_searchStatusMenuItem)
         for service in _browser.services {
-            _menuItems.append(menuItemForService(service))
+            let serviceItem = menuItemForService(service)
+            if _pasteboardController.currentItem == nil {
+                serviceItem.enabled = false
+            }
+            _menuItems.append(serviceItem)
         }
         
         _menuItems.append(NSMenuItem.separatorItem())
