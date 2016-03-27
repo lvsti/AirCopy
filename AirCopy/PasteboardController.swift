@@ -8,6 +8,9 @@
 
 import Foundation
 import AppKit
+import Cutis
+
+
 
 class PasteboardController {
     
@@ -69,53 +72,87 @@ class PasteboardController {
     }
     
     func viewForItem(item: NSPasteboardItem?, constrainedToSize maxSize: CGSize) -> NSView? {
+        guard let item = item else {
+            return nil
+        }
+        
+        return
+            urlPreviewForItem(item, constrainedToSize: maxSize) ??
+            imagePreviewForItem(item, constrainedToSize: maxSize) ??
+            textPreviewForItem(item, constrainedToSize: maxSize)
+    }
+    
+    private func urlPreviewForItem(item: NSPasteboardItem, constrainedToSize maxSize: CGSize) -> NSView? {
+        guard let index = item.types.indexOf({ UTType($0).conformsTo(.URL) }) else {
+            return nil
+        }
+        
+        var urlType = item.types[index]
+        
+        if UTType(urlType).conformsTo(.FileURL) {
+            if let index2 = item.types.indexOf({ UTType($0).conformsTo(.UTF8PlainText) }) {
+                urlType = item.types[index2]
+            }
+        }
+        
+        guard let string = item.stringForType(urlType) else {
+            return nil
+        }
+        
+        return textPreviewForString(string, constrainedToSize: maxSize)
+    }
+    
+    private func imagePreviewForItem(item: NSPasteboardItem, constrainedToSize maxSize: CGSize) -> NSView? {
+        guard let index = item.types.indexOf({ UTType($0).conformsTo(.Image) }) else {
+            return nil
+        }
+        
+        let imageType = item.types[index]
+        
         guard
-            let item = item,
-            let preferredType = item.types.first
+            let imageData = item.dataForType(imageType),
+            let image = NSImage(data: imageData)
         else {
             return nil
         }
         
-        if UTTypeConformsTo(preferredType, kUTTypeImage) {
-            guard
-                let imageData = item.dataForType(preferredType),
-                let image = NSImage(data: imageData)
-            else {
-                return nil
-            }
-            
-            let rect = NSRect(x: 0,
-                              y: 0,
-                              width: maxSize.width,
-                              height: min(image.size.height, maxSize.width*image.size.height/image.size.width))
-            let view = NSImageView(frame: rect)
-            view.image = image
-            return view
+        let rect = NSRect(x: 0,
+                          y: 0,
+                          width: maxSize.width,
+                          height: min(image.size.height, maxSize.width*image.size.height/image.size.width))
+        
+        let view = NSImageView(frame: rect)
+        view.image = image
+        
+        return view
+    }
+    
+    private func textPreviewForItem(item: NSPasteboardItem, constrainedToSize maxSize: CGSize) -> NSView? {
+        guard let index = item.types.indexOf({ UTType($0).conformsTo(.Text) }) else {
+            return nil
         }
         
-        if UTTypeConformsTo(preferredType, kUTTypeText) {
-            guard
-                let string = item.stringForType(preferredType)
-            else {
-                return nil
-            }
-            
-            let view = NSTextField(frame: NSRect.zero)
-            view.selectable = false
-            view.editable = false
-            view.bezeled = false
-            view.stringValue = string
-            
-            view.preferredMaxLayoutWidth = maxSize.width
-            var fitSize = view.intrinsicContentSize// view.sizeThatFits(maxSize)
-            fitSize.width = maxSize.width
-            fitSize.height = min(fitSize.height, maxSize.height)
-            view.frame = NSRect(origin: CGPoint.zero, size: fitSize)
-            
-            return view
+        let textType = item.types[index]
+        guard let string = item.stringForType(textType) else {
+            return nil
         }
-
-        return nil
+        
+        return textPreviewForString(string, constrainedToSize: maxSize)
+    }
+    
+    private func textPreviewForString(string: String, constrainedToSize maxSize: CGSize) -> NSView? {
+        let view = NSTextField(frame: NSRect.zero)
+        view.selectable = false
+        view.editable = false
+        view.bezeled = false
+        view.stringValue = string
+        
+        view.preferredMaxLayoutWidth = maxSize.width
+        let fitSize = CGSize(width: maxSize.width,
+                             height: min(view.intrinsicContentSize.height, maxSize.height))
+        view.frame = NSRect(origin: CGPoint.zero, size: fitSize)
+    
+        return view
     }
     
 }
