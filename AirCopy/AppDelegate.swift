@@ -21,7 +21,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         statusItem = statusBar.statusItemWithLength(NSVariableStatusItemLength)
         
         statusItem.image = NSImage(named: "statusicon")
-        statusItem.alternateImage = NSImage(named: "statusicon_inverted")
+        statusItem.image?.template = true
         statusItem.menu = NSMenu(title: statusItem.title!)
         
         NSMenu.setMenuBarVisible(false)
