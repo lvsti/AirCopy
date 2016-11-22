@@ -8,172 +8,175 @@
 
 import Foundation
 
+public typealias Representation = (String, Data)
+
 
 public protocol AirCopyServiceDelegate: class {
-    func airCopyService(service: AirCopyService,
-        didReceivePasteboardItemsWithRepresentations: [[(String, NSData)]],
-        fromNetService: NSNetService)
+    func airCopyService(_ service: AirCopyService,
+        didReceivePasteboardItemsWithRepresentations: [[Representation]],
+        fromNetService: NetService)
 }
 
 
 public class AirCopyService {
     
-    static let ServiceType = "_aircopy._tcp."
+    static let serviceType = "_aircopy._tcp."
     
-    private let _netService: NSNetService
-    private var _inboundTransfers: [NSNetService: (InboundTransfer, [[(String, NSData)]])]
-    private var _outboundTransfers: [NSNetService: OutboundTransfer]
+    private let netService: NetService
+    private var inboundTransfers: [NetService: (InboundTransfer, [[Representation]])]
+    private var outboundTransfers: [NetService: OutboundTransfer]
     
-    private var _netServiceDelegateProxy: NetServiceDelegateProxy!
-    private var _inboundTransferDelegateProxy: InboundTransferDelegateProxy!
-    private var _outboundTransferDelegateProxy: OutboundTransferDelegateProxy!
+    private var netServiceDelegateProxy: NetServiceDelegateProxy!
+    private var inboundTransferDelegateProxy: InboundTransferDelegateProxy!
+    private var outboundTransferDelegateProxy: OutboundTransferDelegateProxy!
     
-    public var publishedName: String? = nil
+    public private(set) var publishedName: String? = nil
     
     public weak var delegate: AirCopyServiceDelegate? = nil
 
     public static let sharedService = AirCopyService()
 
     private init() {
-        _netService = NSNetService(domain: "", type: AirCopyService.ServiceType, name: "", port: 0)
-        _inboundTransfers = [:]
-        _outboundTransfers = [:]
+        netService = NetService(domain: "", type: AirCopyService.serviceType, name: "", port: 0)
+        inboundTransfers = [:]
+        outboundTransfers = [:]
         
-        _netServiceDelegateProxy = NetServiceDelegateProxy(host: self)
-        _inboundTransferDelegateProxy = InboundTransferDelegateProxy(host: self)
-        _outboundTransferDelegateProxy = OutboundTransferDelegateProxy(host: self)
+        netServiceDelegateProxy = NetServiceDelegateProxy(host: self)
+        inboundTransferDelegateProxy = InboundTransferDelegateProxy(host: self)
+        outboundTransferDelegateProxy = OutboundTransferDelegateProxy(host: self)
     }
     
     public func startAcceptingConnections() {
-        _netService.delegate = _netServiceDelegateProxy
-        _netService.publishWithOptions(.ListenForConnections)
+        netService.delegate = netServiceDelegateProxy
+        netService.publish(options: .listenForConnections)
     }
     
     public func stopAcceptingConnections() {
         publishedName = nil
-        _netService.delegate = nil
-        _netService.stop()
+        netService.delegate = nil
+        netService.stop()
     }
     
-    public func sendPasteboardItemsWithRepresentations(reps: [[(String, NSData)]], toNetService netService: NSNetService) {
-        guard _outboundTransfers[netService] == nil else {
+    public func sendPasteboardItemsWithRepresentations(reps: [[Representation]], to netService: NetService) {
+        guard outboundTransfers[netService] == nil else {
             NSLog("simultaneous transfers to the same service are not supported")
             return
         }
         
-        var ins: NSInputStream? = nil
-        var outs: NSOutputStream? = nil
+        var ins: InputStream? = nil
+        var outs: OutputStream? = nil
         guard
             netService.getInputStream(&ins, outputStream: &outs),
-            let outputStream = outs where outs != nil
+            let outputStream = outs,
+            outs != nil
         else {
             return
         }
 
-        outputStream.scheduleInRunLoop(NSRunLoop.mainRunLoop(), forMode: NSDefaultRunLoopMode)
-        configureSecureTransportForStream(outputStream)
+        outputStream.schedule(in: RunLoop.main, forMode: RunLoopMode.defaultRunLoopMode)
+        configureSecureTransport(for: outputStream)
 
         let transfer = OutboundTransfer(netService: netService, outputStream: outputStream, payload: reps)
-        transfer.delegate = _outboundTransferDelegateProxy
-        _outboundTransfers[netService] = transfer
+        transfer.delegate = outboundTransferDelegateProxy
+        outboundTransfers[netService] = transfer
         
         transfer.start()
     }
     
     // MARK: - private methods:
 
-    private func configureSecureTransportForStream(stream: NSStream) {
-        stream.setProperty(NSStreamSocketSecurityLevelNegotiatedSSL, forKey: NSStreamSocketSecurityLevelKey)
+    private func configureSecureTransport(for stream: Stream) {
+        stream.setProperty(StreamSocketSecurityLevel.negotiatedSSL, forKey: .socketSecurityLevelKey)
     }
     
-    // MARK: - from NSNetServiceDelegate:
+    // MARK: - from NetServiceDelegate:
     
-    private func netServiceDidPublish(sender: NSNetService) {
+    fileprivate func netServiceDidPublish(_ sender: NetService) {
         publishedName = sender.name
     }
     
-    private func netService(sender: NSNetService, didAcceptConnectionWithInputStream inputStream: NSInputStream, outputStream: NSOutputStream) {
+    fileprivate func netService(_ sender: NetService, didAcceptConnectionWithInputStream inputStream: InputStream, outputStream: OutputStream) {
         NSLog("incoming connection")
         
-        guard _inboundTransfers[sender] == nil else {
+        guard inboundTransfers[sender] == nil else {
             NSLog("simultaneous transfers from the same service are not supported")
             return
         }
         
-        inputStream.scheduleInRunLoop(NSRunLoop.mainRunLoop(), forMode: NSDefaultRunLoopMode)
-        configureSecureTransportForStream(inputStream)
+        inputStream.schedule(in: RunLoop.main, forMode: RunLoopMode.defaultRunLoopMode)
+        configureSecureTransport(for: inputStream)
         
         let transfer = InboundTransfer(netService: sender, inputStream: inputStream)
-        transfer.delegate = _inboundTransferDelegateProxy
-        _inboundTransfers[sender] = (transfer, [])
+        transfer.delegate = inboundTransferDelegateProxy
+        inboundTransfers[sender] = (transfer, [])
         
         transfer.start()
     }
     
     // MARK: - from InboundTransferDelegate:
     
-    private func inboundTransfer(transfer: InboundTransfer, didProduceItemWithRepresentations reps: [(String, NSData)]) {
-        var descriptor = _inboundTransfers[transfer.netService]!
+    fileprivate func inboundTransfer(_ transfer: InboundTransfer, didProduceItemWithRepresentations reps: [Representation]) {
+        var descriptor = inboundTransfers[transfer.netService]!
         descriptor.1.append(reps)
-        _inboundTransfers[transfer.netService] = descriptor
+        inboundTransfers[transfer.netService] = descriptor
     }
     
-    private func inboundTransferDidEnd(transfer: InboundTransfer) {
-        let descriptor = _inboundTransfers[transfer.netService]!
-        _inboundTransfers.removeValueForKey(transfer.netService)
+    fileprivate func inboundTransferDidEnd(_ transfer: InboundTransfer) {
+        let descriptor = inboundTransfers[transfer.netService]!
+        inboundTransfers.removeValue(forKey: transfer.netService)
         
-        self.delegate?.airCopyService(self,
+        delegate?.airCopyService(self,
             didReceivePasteboardItemsWithRepresentations: descriptor.1,
             fromNetService: transfer.netService)
     }
     
     // MARK: - from OutboundTransferDelegate:
 
-    private func outboundTransferDidEnd(transfer: OutboundTransfer) {
-        _outboundTransfers.removeValueForKey(transfer.netService)
+    fileprivate func outboundTransferDidEnd(_ transfer: OutboundTransfer) {
+        outboundTransfers.removeValue(forKey: transfer.netService)
     }
     
 }
 
 
-class NetServiceDelegateProxy: NSObject, NSNetServiceDelegate {
-    weak var _host: AirCopyService?
+class NetServiceDelegateProxy: NSObject, NetServiceDelegate {
+    weak var host: AirCopyService?
     init(host: AirCopyService) {
-        _host = host
+        self.host = host
     }
     
-    func netServiceDidPublish(sender: NSNetService) {
-        _host?.netServiceDidPublish(sender)
+    func netServiceDidPublish(_ sender: NetService) {
+        host?.netServiceDidPublish(sender)
     }
     
-    func netService(sender: NSNetService, didAcceptConnectionWithInputStream inputStream: NSInputStream, outputStream: NSOutputStream) {
-        _host?.netService(sender, didAcceptConnectionWithInputStream: inputStream, outputStream: outputStream)
+    func netService(_ sender: NetService, didAcceptConnectionWith inputStream: InputStream, outputStream: OutputStream) {
+        host?.netService(sender, didAcceptConnectionWithInputStream: inputStream, outputStream: outputStream)
     }
 }
 
 class InboundTransferDelegateProxy: InboundTransferDelegate {
-    weak var _host: AirCopyService?
+    weak var host: AirCopyService?
     init(host: AirCopyService) {
-        _host = host
+        self.host = host
     }
     
-    func inboundTransfer(transfer: InboundTransfer, didProduceItemWithRepresentations reps: [(String, NSData)]) {
-        _host?.inboundTransfer(transfer, didProduceItemWithRepresentations: reps)
+    func inboundTransfer(_ transfer: InboundTransfer, didProduceItemWithRepresentations reps: [Representation]) {
+        host?.inboundTransfer(transfer, didProduceItemWithRepresentations: reps)
     }
     
-    func inboundTransferDidEnd(transfer: InboundTransfer) {
-        _host?.inboundTransferDidEnd(transfer)
+    func inboundTransferDidEnd(_ transfer: InboundTransfer) {
+        host?.inboundTransferDidEnd(transfer)
     }
 }
 
 class OutboundTransferDelegateProxy: OutboundTransferDelegate {
-    weak var _host: AirCopyService?
+    weak var host: AirCopyService?
     init(host: AirCopyService) {
-        _host = host
+        self.host = host
     }
     
-    func outboundTransferDidEnd(transfer: OutboundTransfer) {
-        _host?.outboundTransferDidEnd(transfer)
+    func outboundTransferDidEnd(_ transfer: OutboundTransfer) {
+        host?.outboundTransferDidEnd(transfer)
     }
 }
 

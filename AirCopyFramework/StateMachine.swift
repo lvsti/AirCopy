@@ -16,14 +16,13 @@ struct Transition<StateType> {
 
 class StateMachine<StateType: Hashable> {
     typealias TransitionMapType = [StateType: [Transition<StateType>]]
-    let transitions: TransitionMapType
+    private let transitions: TransitionMapType
     
-    private var _currentState: StateType
-    var currentState: StateType { return _currentState }
+    public private(set) var currentState: StateType
     
     init(initialState: StateType, transitions: TransitionMapType) {
         self.transitions = transitions
-        _currentState = initialState
+        currentState = initialState
     }
     
     func step() {
@@ -32,13 +31,13 @@ class StateMachine<StateType: Hashable> {
         while didTransition {
             didTransition = false
             
-            guard let possibleTransitions = transitions[_currentState] else {
+            guard let possibleTransitions = transitions[currentState] else {
                 return
             }
             
             for transition in possibleTransitions {
                 if transition.condition() {
-                    _currentState = transition.nextState
+                    currentState = transition.nextState
                     transition.action()
                     didTransition = true
                 }

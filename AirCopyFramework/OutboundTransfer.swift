@@ -8,15 +8,16 @@
 
 import Foundation
 
-enum IOError: ErrorType {
+enum IOError: Error {
     case Unknown
 }
 
-extension NSOutputStream {
-    func writeUInt8(value: UInt8) throws -> Int {
-        let ptr = UnsafeMutablePointer<UInt8>.alloc(1)
-        defer { ptr.dealloc(1) }
-        ptr.initialize(value)
+extension OutputStream {
+    @discardableResult
+    func writeUInt8(_ value: UInt8) throws -> Int {
+        let ptr = UnsafeMutablePointer<UInt8>.allocate(capacity: 1)
+        defer { ptr.deallocate(capacity: 1) }
+        ptr.initialize(to: value)
         
         let count = write(ptr, maxLength: 1)
         if count < 1 {
@@ -25,30 +26,39 @@ extension NSOutputStream {
         return 1
     }
     
-    func writeUInt64(value: UInt64) throws -> Int {
-        let ptr = UnsafeMutablePointer<UInt64>.alloc(1)
-        defer { ptr.dealloc(1) }
-        ptr.initialize(value.bigEndian)
+    @discardableResult
+    func writeUInt64(_ value: UInt64) throws -> Int {
+        let ptr = UnsafeMutablePointer<UInt64>.allocate(capacity: 1)
+        defer { ptr.deallocate(capacity: 1) }
+        ptr.initialize(to: value.bigEndian)
         
-        let length = sizeof(UInt64)
-        let count = write(UnsafePointer<UInt8>(ptr), maxLength: length)
+        let length = MemoryLayout<UInt64>.size
+        let count = ptr.withMemoryRebound(to: UInt8.self, capacity: length) { ptr in
+            return write(ptr, maxLength: length)
+        }
+
         if count < length {
             throw IOError.Unknown
         }
         return count
     }
     
-    func writeUTF8String(string: String) throws -> Int {
-        guard let data = string.dataUsingEncoding(NSUTF8StringEncoding) else {
+    @discardableResult
+    func writeUTF8String(_ string: String) throws -> Int {
+        guard let data = string.data(using: String.Encoding.utf8) else {
             throw IOError.Unknown
         }
         return try writeData(data)
     }
     
-    func writeData(data: NSData) throws -> Int {
-        let count = try writeUInt64(UInt64(data.length))
-        let count2 = write(UnsafePointer<UInt8>(data.bytes), maxLength: data.length)
-        if count2 < data.length {
+    @discardableResult
+    func writeData(_ data: Data) throws -> Int {
+        let count = try writeUInt64(UInt64(data.count))
+        let count2 = data.withUnsafeBytes { (ptr: UnsafePointer<UInt8>) in
+            return write(ptr, maxLength: data.count)
+        }
+        
+        if count2 < data.count {
             throw IOError.Unknown
         }
         
@@ -58,40 +68,39 @@ extension NSOutputStream {
 
 
 protocol OutboundTransferDelegate: class {
-    func outboundTransferDidEnd(transfer: OutboundTransfer)
+    func outboundTransferDidEnd(_ transfer: OutboundTransfer)
 }
 
-class OutboundTransfer: NSObject, NSStreamDelegate {
+class OutboundTransfer: NSObject, StreamDelegate {
     // dependencies
-    private let _netService: NSNetService
-    var netService: NSNetService { return _netService }
-    private let _outputStream: NSOutputStream
+    public let netService: NetService
+    private let outputStream: OutputStream
     
-    private let _payload: [[(String, NSData)]]
+    private let payload: [[Representation]]
     
     // state
-    private var _outgoingData: NSData!
-    private var _outgoingDataOffset: Int
+    private var outgoingData: NSData!
+    private var outgoingDataOffset: Int
     weak var delegate: OutboundTransferDelegate? = nil
     
-    init(netService: NSNetService, outputStream: NSOutputStream, payload: [[(String, NSData)]]) {
-        _netService = netService
-        _outputStream = outputStream
-        _payload = payload
+    init(netService: NetService, outputStream: OutputStream, payload: [[Representation]]) {
+        self.netService = netService
+        self.outputStream = outputStream
+        self.payload = payload
         
-        _outgoingDataOffset = 0
+        outgoingDataOffset = 0
         
         super.init()
         
-        _outputStream.delegate = self
+        outputStream.delegate = self
     }
     
     func start() {
-        let dataStream = NSOutputStream.outputStreamToMemory()
+        let dataStream = OutputStream.toMemory()
         dataStream.open()
         
         do {
-            for pbItemReps in _payload {
+            for pbItemReps in payload {
                 try dataStream.writeUInt8(UInt8(pbItemReps.count))
                 for (repType, repData) in pbItemReps {
                     try dataStream.writeUTF8String(repType)
@@ -106,41 +115,42 @@ class OutboundTransfer: NSObject, NSStreamDelegate {
         
         dataStream.close()
         
-        guard let rawData = dataStream.propertyForKey(NSStreamDataWrittenToMemoryStreamKey) as? NSData else {
+        guard let rawData = dataStream.property(forKey: .dataWrittenToMemoryStreamKey) as? NSData else {
             delegate?.outboundTransferDidEnd(self)
             return
         }
         
-        _outgoingData = rawData
-        _outgoingDataOffset = 0
+        outgoingData = rawData
+        outgoingDataOffset = 0
         
-        if _outputStream.streamStatus == NSStreamStatus.NotOpen {
-            _outputStream.open()
+        if outputStream.streamStatus == .notOpen {
+            outputStream.open()
         }
     }
     
-    // MARK: - from NSStreamDelegate:
+    // MARK: - from StreamDelegate:
     
-    func stream(stream: NSStream, handleEvent eventCode: NSStreamEvent) {
-        guard eventCode != .EndEncountered && eventCode != .ErrorOccurred else {
+    func stream(_ stream: Stream, handle event: Stream.Event) {
+        guard event != .endEncountered && event != .errorOccurred else {
             stream.close()
             delegate?.outboundTransferDidEnd(self)
             return
         }
         
-        guard eventCode == .HasSpaceAvailable else {
+        guard event == .hasSpaceAvailable else {
             return
         }
         
-        let count = _outputStream.write(UnsafePointer<UInt8>(_outgoingData.bytes).advancedBy(_outgoingDataOffset),
-            maxLength: _outgoingData.length - _outgoingDataOffset)
+        let ptr = outgoingData.bytes.assumingMemoryBound(to: UInt8.self).advanced(by: outgoingDataOffset)
+        let count = outputStream.write(ptr, maxLength: outgoingData.length - outgoingDataOffset)
+        
         guard count >= 0 else {
             stream.close()
             delegate?.outboundTransferDidEnd(self)
             return
         }
         
-        _outgoingDataOffset += count
+        outgoingDataOffset += count
     }
     
 }

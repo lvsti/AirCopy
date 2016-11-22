@@ -9,99 +9,97 @@
 import Foundation
 
 public protocol AirCopyServiceBrowserDelegate: class {
-    func airCopyServiceBrowserDidUpdateServices(browser: AirCopyServiceBrowser)
+    func airCopyServiceBrowserDidUpdateServices(_ browser: AirCopyServiceBrowser)
 }
 
 public class AirCopyServiceBrowser {
     
-    private let _browser: NSNetServiceBrowser
+    private let browser: NetServiceBrowser
     
-    private var _pendingServices: [NSNetService] = []
-    private var _services: [NSNetService] = []
-    public var services: [NSNetService] { return _services }
+    private var pendingServices: [NetService] = []
+    public private(set) var services: [NetService] = []
     
-    private var _isSearching: Bool
-    public var isSearching: Bool { return _isSearching }
+    public private(set) var isSearching: Bool
     
-    private var _netServiceBrowserDelegateProxy: NetServiceBrowserDelegateProxy!
+    private var netServiceBrowserDelegateProxy: NetServiceBrowserDelegateProxy!
     
     public weak var delegate: AirCopyServiceBrowserDelegate? = nil
 
     public init() {
-        _browser = NSNetServiceBrowser()
-        _isSearching = false
+        browser = NetServiceBrowser()
+        isSearching = false
 
-        _netServiceBrowserDelegateProxy = NetServiceBrowserDelegateProxy(host: self)
+        netServiceBrowserDelegateProxy = NetServiceBrowserDelegateProxy(host: self)
     }
     
     public func start() {
-        _browser.delegate = _netServiceBrowserDelegateProxy
-        _browser.stop()
+        browser.delegate = netServiceBrowserDelegateProxy
+        browser.stop()
 
-        _pendingServices.removeAll(keepCapacity: true)
-        _browser.searchForServicesOfType(AirCopyService.ServiceType, inDomain: "")
+        pendingServices.removeAll(keepingCapacity: true)
+        browser.searchForServices(ofType: AirCopyService.serviceType, inDomain: "")
     }
     
     public func stop() {
-        _browser.stop()
+        browser.stop()
     }
     
-    // MARK: - NSNetServiceBrowserDelegate:
+    // MARK: - NetServiceBrowserDelegate:
     
-    private func netServiceBrowser(browser: NSNetServiceBrowser, didFindService service: NSNetService, moreComing: Bool) {
+    fileprivate func netServiceBrowser(_ browser: NetServiceBrowser, didFind service: NetService, moreComing: Bool) {
         if service.name != AirCopyService.sharedService.publishedName {
-            _pendingServices.append(service)
+            pendingServices.append(service)
         }
     
         if !moreComing {
-            _services = _pendingServices
-            _isSearching = false
+            services = pendingServices
+            isSearching = false
             delegate?.airCopyServiceBrowserDidUpdateServices(self)
         }
     }
 
-    private func netServiceBrowser(browser: NSNetServiceBrowser, didRemoveService service: NSNetService, moreComing: Bool) {
-        if let index = _pendingServices.indexOf(service) {
-            _pendingServices.removeAtIndex(index)
+    fileprivate func netServiceBrowser(_ browser: NetServiceBrowser, didRemove service: NetService, moreComing: Bool) {
+        if let index = pendingServices.index(of: service) {
+            pendingServices.remove(at: index)
         }
         
         if !moreComing {
-            _services = _pendingServices
-            _isSearching = false
+            services = pendingServices
+            isSearching = false
             delegate?.airCopyServiceBrowserDidUpdateServices(self)
         }
     }
     
-    private func netServiceBrowserWillSearch(browser: NSNetServiceBrowser) {
-        _isSearching = true
+    fileprivate func netServiceBrowserWillSearch(browser: NetServiceBrowser) {
+        isSearching = true
     }
     
-    private func netServiceBrowserDidStopSearch(browser: NSNetServiceBrowser) {
-        _isSearching = false
+    fileprivate func netServiceBrowserDidStopSearch(browser: NetServiceBrowser) {
+        isSearching = false
     }
     
 }
 
-class NetServiceBrowserDelegateProxy: NSObject, NSNetServiceBrowserDelegate {
-    weak var _host: AirCopyServiceBrowser?
+class NetServiceBrowserDelegateProxy: NSObject, NetServiceBrowserDelegate {
+    weak var host: AirCopyServiceBrowser?
     init(host: AirCopyServiceBrowser) {
-        _host = host
+        self.host = host
     }
 
-    func netServiceBrowser(browser: NSNetServiceBrowser, didFindService service: NSNetService, moreComing: Bool) {
-        _host?.netServiceBrowser(browser, didFindService: service, moreComing: moreComing)
+    func netServiceBrowser(_ browser: NetServiceBrowser, didFind service: NetService, moreComing: Bool) {
+        host?.netServiceBrowser(browser, didFind: service, moreComing: moreComing)
     }
     
-    func netServiceBrowser(browser: NSNetServiceBrowser, didRemoveService service: NSNetService, moreComing: Bool) {
-        _host?.netServiceBrowser(browser, didRemoveService: service, moreComing: moreComing)
+    func netServiceBrowser(_ browser: NetServiceBrowser, didRemove service: NetService, moreComing: Bool) {
+        host?.netServiceBrowser(browser, didRemove: service, moreComing: moreComing)
     }
 
-    func netServiceBrowserWillSearch(browser: NSNetServiceBrowser) {
-        _host?.netServiceBrowserWillSearch(browser)
+    func netServiceBrowserWillSearch(_ browser: NetServiceBrowser) {
+        host?.netServiceBrowserWillSearch(browser: browser)
     }
     
-    func netServiceBrowserDidStopSearch(browser: NSNetServiceBrowser) {
-        _host?.netServiceBrowserDidStopSearch(browser)
+    func netServiceBrowserDidStopSearch(_ browser: NetServiceBrowser) {
+        host?.netServiceBrowserDidStopSearch(browser: browser)
     }
 }
 
