@@ -13,86 +13,86 @@ import Cutis
 
 let kDefaultWidth: CGFloat = 250
 let kMaxItemHeight: CGFloat = 250
-let kSearchStatusChangeTreshold: NSTimeInterval = 1.0
+let kSearchStatusChangeTreshold: TimeInterval = 1.0
 
 class MenuController: NSObject, NSMenuDelegate, AirCopyServiceBrowserDelegate, AirCopyServiceDelegate {
     // dependencies
-    private let _menu: NSMenu
-    private let _service: AirCopyService
-    private let _browser: AirCopyServiceBrowser
-    private let _pasteboardController: PasteboardController
+    private let menu: NSMenu
+    private let service: AirCopyService
+    private let browser: AirCopyServiceBrowser
+    private let pasteboardController: PasteboardController
 
     // state
-    private var _menuItems: [NSMenuItem]
-    private var _searchStatusMenuItem: NSMenuItem!
-    private var _receivedStatusMenuItem: NSMenuItem!
-    private var _searchStartDate: NSDate?
-    private var _visibleServiceCount: Int
-    private var _visibleReceivedCount: Int
+    private var menuItems: [NSMenuItem]
+    private var searchStatusMenuItem: NSMenuItem!
+    private var receivedStatusMenuItem: NSMenuItem!
+    private var searchStartDate: Date?
+    private var visibleServiceCount: Int
+    private var visibleReceivedCount: Int
     
     init(menu: NSMenu, service: AirCopyService, browser: AirCopyServiceBrowser, pasteboardController: PasteboardController) {
-        _menu = menu
-        _service = service
-        _browser = browser
-        _pasteboardController = pasteboardController
+        self.menu = menu
+        self.service = service
+        self.browser = browser
+        self.pasteboardController = pasteboardController
         
-        _menuItems = []
-        _visibleServiceCount = 0
-        _visibleReceivedCount = 0
+        menuItems = []
+        visibleServiceCount = 0
+        visibleReceivedCount = 0
         
         super.init()
         
-        _browser.delegate = self
-        _menu.delegate = self
-        _service.delegate = self
+        browser.delegate = self
+        menu.delegate = self
+        service.delegate = self
     }
     
     private func rebuildMenu() {
-        _menuItems.removeAll(keepCapacity: true)
+        menuItems.removeAll(keepingCapacity: true)
         
-        _visibleServiceCount = _browser.services.count
-        _visibleReceivedCount = _pasteboardController.receivedItems.count
+        visibleServiceCount = browser.services.count
+        visibleReceivedCount = pasteboardController.receivedItems.count
 
-        _menuItems.append(menuItemForPasteboardPreview())
+        menuItems.append(menuItemForPasteboardPreview())
         
-        _menuItems.append(NSMenuItem.separatorItem())
-        _searchStatusMenuItem = NSMenuItem(title: titleForSearchStatusMenuItem())
-        _menuItems.append(_searchStatusMenuItem)
-        for service in _browser.services {
-            let serviceItem = menuItemForService(service)
-            if _pasteboardController.currentItem == nil {
-                serviceItem.enabled = false
+        menuItems.append(NSMenuItem.separator())
+        searchStatusMenuItem = NSMenuItem(title: titleForSearchStatusMenuItem())
+        menuItems.append(searchStatusMenuItem)
+        for service in browser.services {
+            let serviceItem = menuItemForService(service: service)
+            if pasteboardController.currentItem == nil {
+                serviceItem.isEnabled = false
             }
-            _menuItems.append(serviceItem)
+            menuItems.append(serviceItem)
         }
         
-        _menuItems.append(NSMenuItem.separatorItem())
-        _receivedStatusMenuItem = NSMenuItem(title: titleForReceivedStatusMenuItem())
-        _menuItems.append(_receivedStatusMenuItem)
+        menuItems.append(NSMenuItem.separator())
+        receivedStatusMenuItem = NSMenuItem(title: titleForReceivedStatusMenuItem())
+        menuItems.append(receivedStatusMenuItem)
 
-        let sortedKeys = _pasteboardController.receivedItems.keys.sort(<)
+        let sortedKeys = pasteboardController.receivedItems.keys.sorted(by: <)
         for key in sortedKeys {
-            let pbItem = _pasteboardController.receivedItems[key]!
-            _menuItems.append(menuItemForReceivedPasteboardItem(pbItem, withKey: key))
+            let pbItem = pasteboardController.receivedItems[key]!
+            menuItems.append(menuItemForReceivedPasteboardItem(pbItem, withKey: key))
         }
         
-        _menuItems.append(NSMenuItem.separatorItem())
-        _menuItems.append(NSMenuItem(title: "Quit AirCopy", keyEquivalent: "q") { _ in
-            NSApplication.sharedApplication().terminate(nil)
+        menuItems.append(NSMenuItem.separator())
+        menuItems.append(NSMenuItem(title: "Quit AirCopy", keyEquivalent: "q") { _ in
+            NSApplication.shared().terminate(nil)
         })
     }
     
     private func renderMenu() {
-        _menu.removeAllItems()
-        for item in _menuItems {
-            _menu.addItem(item)
+        menu.removeAllItems()
+        for item in menuItems {
+            menu.addItem(item)
         }
     }
 
     private func menuItemForPasteboardPreview() -> NSMenuItem {
-        _pasteboardController.updateCurrentItem()
-        let item = _pasteboardController.currentItem
-        let preview = _pasteboardController.viewForItem(item,
+        pasteboardController.updateCurrentItem()
+        let item = pasteboardController.currentItem
+        let preview = pasteboardController.viewForItem(item: item,
             constrainedToSize: CGSize(width: kDefaultWidth, height: kMaxItemHeight))
         
         let menuItem = NSMenuItem(title: "Clipboard is empty")
@@ -113,24 +113,24 @@ class MenuController: NSObject, NSMenuDelegate, AirCopyServiceBrowserDelegate, A
     }
     
     private func titleForSearchStatusMenuItem() -> String {
-        if _browser.isSearching {
+        if browser.isSearching {
             return "Searching..."
         }
         
-        return _visibleServiceCount > 0 ? "Send clipboard contents to:" : "No nearby computers"
+        return visibleServiceCount > 0 ? "Send clipboard contents to:" : "No nearby computers"
     }
     
     private func titleForReceivedStatusMenuItem() -> String {
-        return _visibleReceivedCount > 0 ? "Received clipboards:" : "No received clipboards"
+        return visibleReceivedCount > 0 ? "Received clipboards:" : "No received clipboards"
     }
     
-    private func menuItemForService(service: NSNetService) -> NSMenuItem {
+    private func menuItemForService(service: NetService) -> NSMenuItem {
         let menuItem = NSMenuItem(title: service.name) { [unowned self] _ in
-            guard let pasteboardItem = self._pasteboardController.currentItem else {
+            guard let pasteboardItem = self.pasteboardController.currentItem else {
                 return
             }
-            let reps = self._pasteboardController.representationsForItem(pasteboardItem)
-            self._service.sendPasteboardItemsWithRepresentations([reps], toNetService: service)
+            let reps = self.pasteboardController.representationsForItem(item: pasteboardItem)
+            self.service.sendPasteboardItemsWithRepresentations(reps: [reps], to: service)
         }
         
         menuItem.indentationLevel = 1
@@ -138,17 +138,17 @@ class MenuController: NSObject, NSMenuDelegate, AirCopyServiceBrowserDelegate, A
         return menuItem
     }
     
-    private func menuItemForReceivedPasteboardItem(pbItem: NSPasteboardItem, withKey key: String) -> NSMenuItem {
+    private func menuItemForReceivedPasteboardItem(_ pbItem: NSPasteboardItem, withKey key: String) -> NSMenuItem {
         let previewItem = NSMenuItem(title: "<clipboard preview>")
-        previewItem.view = _pasteboardController.viewForItem(pbItem,
+        previewItem.view = pasteboardController.viewForItem(item: pbItem,
             constrainedToSize: CGSize(width: kDefaultWidth, height: kMaxItemHeight))
         
         let applyItem = NSMenuItem(title: "Apply")  { [unowned self] _ in
-            self._pasteboardController.makeCurrentReceivedItemWithKey(key)
+            self.pasteboardController.makeCurrentReceivedItemWithKey(key: key)
             self.rebuildMenu()
         }
         let deleteItem = NSMenuItem(title: "Delete")  { [unowned self] _ in
-            self._pasteboardController.deleteReceiveItemWithKey(key)
+            self.pasteboardController.deleteReceiveItemWithKey(key: key)
             self.rebuildMenu()
         }
         
@@ -165,63 +165,67 @@ class MenuController: NSObject, NSMenuDelegate, AirCopyServiceBrowserDelegate, A
     }
     
     func updateMenu() {
-        guard _menu.highlightedItem != nil else {
+        guard menu.highlightedItem != nil else {
             rebuildMenu()
             renderMenu()
-            _menu.update()
+            menu.update()
             return
         }
         
-        _searchStatusMenuItem.title = titleForSearchStatusMenuItem()
-        _menu.itemChanged(_searchStatusMenuItem)
+        searchStatusMenuItem.title = titleForSearchStatusMenuItem()
+        menu.itemChanged(searchStatusMenuItem)
 
-        _receivedStatusMenuItem.title = titleForReceivedStatusMenuItem()
-        _menu.itemChanged(_receivedStatusMenuItem)
+        receivedStatusMenuItem.title = titleForReceivedStatusMenuItem()
+        menu.itemChanged(receivedStatusMenuItem)
     }
 
     // MARK: - from NSMenuDelegate:
     
-    func menuNeedsUpdate(menu: NSMenu) {
-        guard menu == _menu else {
+    func menuNeedsUpdate(_ menu: NSMenu) {
+        guard menu == self.menu else {
             return
         }
 
-        _searchStartDate = NSDate()
-        _browser.start()
+        searchStartDate = Date()
+        browser.start()
         rebuildMenu()
         renderMenu()
     }
     
     // MARK: - from AirCopyServiceBrowserDelegate:
     
-    func airCopyServiceBrowserDidUpdateServices(browser: AirCopyServiceBrowser) {
-        let elapsed = NSDate().timeIntervalSinceDate(_searchStartDate!)
+    func airCopyServiceBrowserDidUpdateServices(_ browser: AirCopyServiceBrowser) {
+        let elapsed = Date().timeIntervalSince(searchStartDate!)
         if elapsed > kSearchStatusChangeTreshold {
             updateMenu()
         }
         else {
-            let timer = NSTimer(timeInterval: kSearchStatusChangeTreshold - elapsed,
+            let timer = Timer(timeInterval: kSearchStatusChangeTreshold - elapsed,
                 target: self,
-                selector: "updateMenu",
+                selector: #selector(MenuController.updateMenu),
                 userInfo: nil,
                 repeats: false)
-            NSRunLoop.currentRunLoop().addTimer(timer, forMode: NSEventTrackingRunLoopMode)
+            RunLoop.current.add(timer, forMode: .eventTrackingRunLoopMode)
         }
     }
     
     // MARK: - from AirCopyServiceDelegate:
     
-    func airCopyService(service: AirCopyService,
-        didReceivePasteboardItemsWithRepresentations items: [[(String, NSData)]],
-        fromNetService netService: NSNetService) {
+    func airCopyService(_ service: AirCopyService,
+        didReceivePasteboardItemsWithRepresentations items: [[Representation]],
+        fromNetService netService: NetService) {
         // currently only the first item is used
         guard let reps = items.first else {
             return
         }
         
-        _pasteboardController.addReceivedItemWithRepresentations(reps, forKey: netService.name)
+        pasteboardController.addReceivedItemWithRepresentations(reps, forKey: netService.name)
         
-        NSRunLoop.currentRunLoop().performSelector("updateMenu", target: self, argument: nil, order: 0, modes: [NSEventTrackingRunLoopMode])
+        RunLoop.current.perform(#selector(MenuController.updateMenu),
+                                target: self,
+                                argument: nil,
+                                order: 0,
+                                modes: [.eventTrackingRunLoopMode])
     }
     
 }

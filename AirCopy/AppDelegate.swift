@@ -13,15 +13,15 @@ import AirCopyFramework
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
 
-    var statusItem: NSStatusItem!
-    var menuController: MenuController!
+    private var statusItem: NSStatusItem!
+    private var menuController: MenuController!
 
     func applicationDidFinishLaunching(aNotification: NSNotification) {
-        let statusBar = NSStatusBar.systemStatusBar()
-        statusItem = statusBar.statusItemWithLength(NSVariableStatusItemLength)
+        let statusBar = NSStatusBar.system()
+        statusItem = statusBar.statusItem(withLength: NSVariableStatusItemLength)
         
         statusItem.image = NSImage(named: "statusicon")
-        statusItem.image?.template = true
+        statusItem.image?.isTemplate = true
         statusItem.menu = NSMenu(title: statusItem.title!)
         
         NSMenu.setMenuBarVisible(false)
