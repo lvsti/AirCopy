@@ -8,12 +8,12 @@ AirCopy is an OSX status bar app that lets you transfer clipboard contents betwe
 
 **To run**: Mac OS X 10.9 and above
 
-**To build**: Xcode 7.2, Swift 2.1
+**To build**: Xcode 8.1, Swift 3.0
 
 ### Features
 
 - preview current clipboard contents (as of now, text and images only)
-- discover devices on the local network that are also running AirCopy
+- discover devices (as of now, Macs) on the local network that are also running AirCopy
 - send current clipboard to the selected device using secure transport (SSL)
 - receive clipboards from other devices
 - apply or delete received content
