@@ -79,7 +79,7 @@ class OutboundTransfer: NSObject, StreamDelegate {
     private let payload: [[Representation]]
     
     // state
-    private var outgoingData: NSData!
+    private var outgoingData: Data!
     private var outgoingDataOffset: Int
     weak var delegate: OutboundTransferDelegate? = nil
     
@@ -115,7 +115,7 @@ class OutboundTransfer: NSObject, StreamDelegate {
         
         dataStream.close()
         
-        guard let rawData = dataStream.property(forKey: .dataWrittenToMemoryStreamKey) as? NSData else {
+        guard let rawData = dataStream.property(forKey: .dataWrittenToMemoryStreamKey) as? Data else {
             delegate?.outboundTransferDidEnd(self)
             return
         }
@@ -141,8 +141,9 @@ class OutboundTransfer: NSObject, StreamDelegate {
             return
         }
         
-        let ptr = outgoingData.bytes.assumingMemoryBound(to: UInt8.self).advanced(by: outgoingDataOffset)
-        let count = outputStream.write(ptr, maxLength: outgoingData.length - outgoingDataOffset)
+        let count = outgoingData.withUnsafeBytes { (ptr: UnsafePointer<UInt8>) in
+            return outputStream.write(ptr.advanced(by: outgoingDataOffset), maxLength: outgoingData.count - outgoingDataOffset)
+        }
         
         guard count >= 0 else {
             stream.close()
