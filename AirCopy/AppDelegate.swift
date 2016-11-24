@@ -16,7 +16,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusItem: NSStatusItem!
     private var menuController: MenuController!
 
-    func applicationDidFinishLaunching(aNotification: NSNotification) {
+    func applicationDidFinishLaunching(_ notification: Notification) {
         let statusBar = NSStatusBar.system()
         statusItem = statusBar.statusItem(withLength: NSVariableStatusItemLength)
         
