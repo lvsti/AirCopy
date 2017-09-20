@@ -78,7 +78,7 @@ class MenuController: NSObject, NSMenuDelegate, AirCopyServiceBrowserDelegate, A
         
         menuItems.append(NSMenuItem.separator())
         menuItems.append(NSMenuItem(title: "Quit AirCopy", keyEquivalent: "q") { _ in
-            NSApplication.shared().terminate(nil)
+            NSApplication.shared.terminate(nil)
         })
     }
     
@@ -100,7 +100,7 @@ class MenuController: NSObject, NSMenuDelegate, AirCopyServiceBrowserDelegate, A
 
         if item != nil && preview == nil {
             if let itemType = item?.types.first,
-               let dec = UTType(itemType).declaration,
+               let dec = UTType(itemType.rawValue).declaration,
                let desc = dec.typeDescription {
                 menuItem.title = "No preview available for " + desc
             }
@@ -164,7 +164,7 @@ class MenuController: NSObject, NSMenuDelegate, AirCopyServiceBrowserDelegate, A
         return menuItem
     }
     
-    func updateMenu() {
+    @objc func updateMenu() {
         guard menu.highlightedItem != nil else {
             rebuildMenu()
             renderMenu()

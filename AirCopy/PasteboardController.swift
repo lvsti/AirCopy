@@ -23,7 +23,7 @@ class PasteboardController {
     private let _pasteboard: NSPasteboard
     
     init() {
-        _pasteboard = NSPasteboard.general()
+        _pasteboard = NSPasteboard.general
     }
     
     func updateCurrentItem() {
@@ -34,7 +34,7 @@ class PasteboardController {
         let pbItem = NSPasteboardItem()
         
         for rep in reps {
-            pbItem.setData(rep.1, forType: rep.0)
+            pbItem.setData(rep.1, forType: NSPasteboard.PasteboardType(rawValue: rep.0))
         }
         
         _receivedItems[key] = pbItem
@@ -45,10 +45,10 @@ class PasteboardController {
         
         for repType in item.types {
             guard let repData = item.data(forType: repType) else {
-                NSLog("cannot get data for representation %@", repType)
+                NSLog("cannot get data for representation \(repType)")
                 continue
             }
-            reps.append((repType, repData))
+            reps.append((repType.rawValue, repData))
         }
         
         return reps
@@ -83,14 +83,14 @@ class PasteboardController {
     }
     
     private func urlPreview(item: NSPasteboardItem, constrainedToSize maxSize: CGSize) -> NSView? {
-        guard let index = item.types.index(where: { UTType($0).conforms(to: .url) }) else {
+        guard let index = item.types.index(where: { UTType($0.rawValue).conforms(to: .url) }) else {
             return nil
         }
         
         var urlType = item.types[index]
         
-        if UTType(urlType).conforms(to: .fileURL) {
-            if let index2 = item.types.index(where: { UTType($0).conforms(to: .utf8PlainText) }) {
+        if UTType(urlType.rawValue).conforms(to: .fileURL) {
+            if let index2 = item.types.index(where: { UTType($0.rawValue).conforms(to: .utf8PlainText) }) {
                 urlType = item.types[index2]
             }
         }
@@ -103,7 +103,7 @@ class PasteboardController {
     }
     
     private func imagePreview(item: NSPasteboardItem, constrainedToSize maxSize: CGSize) -> NSView? {
-        guard let index = item.types.index(where: { UTType($0).conforms(to: .image) }) else {
+        guard let index = item.types.index(where: { UTType($0.rawValue).conforms(to: .image) }) else {
             return nil
         }
         
@@ -128,7 +128,7 @@ class PasteboardController {
     }
     
     private func textPreview(item: NSPasteboardItem, constrainedToSize maxSize: CGSize) -> NSView? {
-        guard let index = item.types.index(where: { UTType($0).conforms(to: .text) }) else {
+        guard let index = item.types.index(where: { UTType($0.rawValue).conforms(to: .text) }) else {
             return nil
         }
         

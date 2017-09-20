@@ -17,10 +17,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private var menuController: MenuController!
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        let statusBar = NSStatusBar.system()
-        statusItem = statusBar.statusItem(withLength: NSVariableStatusItemLength)
+        let statusBar = NSStatusBar.system
+        statusItem = statusBar.statusItem(withLength: NSStatusItem.variableLength)
         
-        statusItem.image = NSImage(named: "statusicon")
+        statusItem.image = NSImage(named: NSImage.Name(rawValue: "statusicon"))
         statusItem.image?.isTemplate = true
         statusItem.menu = NSMenu(title: statusItem.title!)
         
