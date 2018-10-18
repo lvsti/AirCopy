@@ -205,7 +205,7 @@ class MenuController: NSObject, NSMenuDelegate, AirCopyServiceBrowserDelegate, A
                 selector: #selector(MenuController.updateMenu),
                 userInfo: nil,
                 repeats: false)
-            RunLoop.current.add(timer, forMode: .eventTrackingRunLoopMode)
+            RunLoop.current.add(timer, forMode: .eventTracking)
         }
     }
     
@@ -225,7 +225,7 @@ class MenuController: NSObject, NSMenuDelegate, AirCopyServiceBrowserDelegate, A
                                 target: self,
                                 argument: nil,
                                 order: 0,
-                                modes: [.eventTrackingRunLoopMode])
+                                modes: [.eventTracking])
     }
     
 }

@@ -16,7 +16,7 @@ extension OutputStream {
     @discardableResult
     func writeUInt8(_ value: UInt8) throws -> Int {
         let ptr = UnsafeMutablePointer<UInt8>.allocate(capacity: 1)
-        defer { ptr.deallocate(capacity: 1) }
+        defer { ptr.deallocate() }
         ptr.initialize(to: value)
         
         let count = write(ptr, maxLength: 1)
@@ -29,7 +29,7 @@ extension OutputStream {
     @discardableResult
     func writeUInt64(_ value: UInt64) throws -> Int {
         let ptr = UnsafeMutablePointer<UInt64>.allocate(capacity: 1)
-        defer { ptr.deallocate(capacity: 1) }
+        defer { ptr.deallocate() }
         ptr.initialize(to: value.bigEndian)
         
         let length = MemoryLayout<UInt64>.size

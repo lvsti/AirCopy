@@ -73,7 +73,7 @@ public class AirCopyService {
             return
         }
 
-        outputStream.schedule(in: RunLoop.main, forMode: RunLoopMode.defaultRunLoopMode)
+        outputStream.schedule(in: .main, forMode: .default)
         configureSecureTransport(for: outputStream)
 
         let transfer = OutboundTransfer(netService: netService, outputStream: outputStream, payload: reps)
@@ -103,7 +103,7 @@ public class AirCopyService {
             return
         }
         
-        inputStream.schedule(in: RunLoop.main, forMode: RunLoopMode.defaultRunLoopMode)
+        inputStream.schedule(in: .main, forMode: .default)
         configureSecureTransport(for: inputStream)
         
         let transfer = InboundTransfer(netService: sender, inputStream: inputStream)

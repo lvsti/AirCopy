@@ -56,7 +56,7 @@ class InboundTransfer: NSObject, StreamDelegate {
     
     deinit {
         inputStream.close()
-        chunk.deallocate(capacity: InboundTransfer.chunkSize)
+        chunk.deallocate()
     }
     
     func start() {

@@ -20,7 +20,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let statusBar = NSStatusBar.system
         statusItem = statusBar.statusItem(withLength: NSStatusItem.variableLength)
         
-        statusItem.image = NSImage(named: NSImage.Name(rawValue: "statusicon"))
+        statusItem.image = #imageLiteral(resourceName: "statusicon")
         statusItem.image?.isTemplate = true
         statusItem.menu = NSMenu(title: statusItem.title!)
         
